@@ -1,1 +1,1 @@
-<h1>SDL project template</h1>
+<h1>SDL RAYCASTER</h1>
