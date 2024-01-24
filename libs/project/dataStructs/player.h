@@ -1,5 +1,5 @@
 #define RADIANS M_PI / 180
-#define DEP 5
+#define DEP 2 // move by fact
 
 typedef struct
 {
@@ -47,8 +47,8 @@ Player *initPlayer()
 {
     Player *rslt = (Player *)malloc(sizeof(Player));
 
-    rslt->x = 225;
-    rslt->y = 225;
+    rslt->x = worldX + UNIT2D * 4;
+    rslt->y = worldY + UNIT2D * 4;
 
     rslt->a = 0;
 
@@ -69,8 +69,8 @@ void movePlayer(Player *player, int d)
     double newX = player->x + dirs[d][0] * DEP;
     double newY = player->y + dirs[d][1] * DEP;
 
-    int i = (newX + (dirs[d][0] > 0 ? 1 : -1) * DEP * 2) / (double)UNIT2D;
-    int j = (newY + (dirs[d][1] > 0 ? 1 : -1) * DEP * 2) / (double)UNIT2D;
+    int i = (newX + (dirs[d][0] > 0 ? 1 : -1) * DEP * 2 - worldX) / (double)UNIT2D;
+    int j = (newY + (dirs[d][1] > 0 ? 1 : -1) * DEP * 2 - worldY) / (double)UNIT2D;
 
     if (!world[i + j * 8])
     {

@@ -1,7 +1,6 @@
 
 int keys[4] = {SDLK_w, SDLK_d, SDLK_s, SDLK_a};
 
-
 void eventFunc(SDL_Event e)
 {
     if (e.type == SDL_KEYDOWN)
@@ -72,7 +71,7 @@ void drawPlayer(SDL_Renderer *renderer)
     // draw body
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 
-    const int unit = DEP*4;
+    const int unit = DEP * 4;
 
     SDL_Rect rect;
     rect.x = player->x - unit / 2;
@@ -84,23 +83,20 @@ void drawPlayer(SDL_Renderer *renderer)
     SDL_RenderDrawRect(renderer, &rect);
 
     // draw sight
-    
+
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
     int px = player->x;
     int py = player->y;
     SDL_RenderDrawLine(renderer, px, py, px + player->ax * unit, py + player->ay * unit);
-    
 }
 
 void drawRay(SDL_Renderer *renderer)
 {
     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
 
-    const int FOV = 60;    
+    const int FOV = 60;
     const int raysDiv = 3;
-
-
 
     int drawDistance;
 
@@ -110,7 +106,7 @@ void drawRay(SDL_Renderer *renderer)
     double x2;
     double y2;
 
-    for (int a = player->a - FOV/2; a < player->a + FOV/2; a+=raysDiv) // draw multiple rays (10)
+    for (int a = player->a - FOV / 2; a < player->a + FOV / 2; a += raysDiv) // draw multiple rays (10)
     {
         drawDistance = 10;
 
@@ -121,8 +117,8 @@ void drawRay(SDL_Renderer *renderer)
         y2 = player->y + ay * drawDistance;
 
         // normalize the coords
-        int i = x2 / UNIT2D;
-        int j = y2 / UNIT2D;
+        int i = (x2 - worldX) / UNIT2D;
+        int j = (y2 - worldY) / UNIT2D;
 
         while (!world[i + j * 8]) // wall not found
         {
@@ -132,8 +128,8 @@ void drawRay(SDL_Renderer *renderer)
             y2 = player->y + ay * drawDistance;
 
             // normalize the coords
-            i = x2 / UNIT2D;
-            j = y2 / UNIT2D;
+            i = (x2 - worldX) / UNIT2D;
+            j = (y2 - worldY) / UNIT2D;
         }
 
         // wall found
@@ -152,13 +148,12 @@ void loopFunc(Window *win)
     // draw 2 map
     drawMap2D(renderer);
 
-    // draw player
-    drawPlayer(renderer);
-
     // draw rays
     drawRay(renderer);
+
+    // draw player
+    drawPlayer(renderer);
 
     //
     SDL_RenderPresent(renderer);
 }
-

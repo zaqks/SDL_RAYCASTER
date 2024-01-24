@@ -1,7 +1,7 @@
-#define UNIT2D 50
+#define UNIT2D 30
 
 int worldX = 0;
-int worldY = 0;
+int worldY = 768 - UNIT2D * 8;
 
 int world[] = {
     1, 1, 1, 1, 1, 1, 1, 1,
@@ -12,6 +12,3 @@ int world[] = {
     1, 0, 0, 0, 0, 1, 0, 1,
     1, 0, 0, 0, 0, 0, 0, 1,
     1, 1, 1, 1, 1, 1, 1, 1};
-
-
-
