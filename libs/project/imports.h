@@ -2,7 +2,8 @@
 
 #include "../dataStructs/arrays.h"
 
-#include "dataStructs/point.h"
+#include "dataStructs/player.h"
+
 #include "vars/vars.h"
 #include "vars/vars1.h"
 
