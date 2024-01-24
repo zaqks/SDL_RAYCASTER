@@ -1,6 +1,5 @@
 #include "../SDL/mySDL.h"
 
-
 #include "vars/vars1.h"
 #include "dataStructs/player.h"
 
