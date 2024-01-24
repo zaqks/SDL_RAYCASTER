@@ -34,33 +34,26 @@ void eventFunc(SDL_Event e)
 void drawMap2D(SDL_Renderer *renderer)
 {
     SDL_Rect current;
-    current.w = UNIT2D;
-    current.h = UNIT2D;
+    current.w = UNIT2D - 1;
+    current.h = UNIT2D - 1;
 
     // draw the walls
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     for (int j = 0; j < 8; j++)
     {
         current.y = j * current.h + worldY;
+        current.y += j;
+
         for (int i = 0; i < 8; i++)
         {
             if (world[i + 8 * j])
             {
                 current.x = i * current.w + worldX;
+                current.x += i;
+
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
                 SDL_RenderFillRect(renderer, &current);
                 SDL_RenderDrawRect(renderer, &current);
             }
-        }
-    }
-    // draw the outlines
-    SDL_SetRenderDrawColor(renderer, 128, 128, 128, 128);
-    for (int j = 0; j < 8; j++)
-    {
-        current.y = j * current.h + worldY;
-        for (int i = 0; i < 8; i++)
-        {
-            current.x = i * current.w + worldX;
-            SDL_RenderDrawRect(renderer, &current);
         }
     }
 }
@@ -91,11 +84,11 @@ void drawPlayer(SDL_Renderer *renderer)
     SDL_RenderDrawLine(renderer, px, py, px + player->ax * unit, py + player->ay * unit);
 }
 
-void drawRay(SDL_Renderer *renderer)
+void drawRays(SDL_Renderer *renderer)
 {
     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
 
-    const int FOV = 60;
+    const int FOV = 135;
     const int raysDiv = 1;
 
     int drawFact;
@@ -106,9 +99,9 @@ void drawRay(SDL_Renderer *renderer)
     double x2;
     double y2;
 
-    double distance;
+    double *distance;
 
-    int lineX = 0;
+    Queue *wallsH = initQueue();
 
     for (int a = player->a - FOV / 2; a < player->a + FOV / 2; a += raysDiv) // draw multiple rays (10)
     {
@@ -137,19 +130,34 @@ void drawRay(SDL_Renderer *renderer)
         }
 
         // wall found
-        distance = sqrt(pow(x2 - player->x, 2) + pow(y2 - player->y, 2));
+        SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2); // draw ray
 
-        SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+        // wall distance
+        distance = (double *)malloc(sizeof(double));
+        *distance = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
+        pushQueueNode(wallsH, distance);
+    }
 
-        // draw the walls
-        int lineH = SCREEN_HEIGHT * 8 / distance;
-        int offset = (SCREEN_HEIGHT - lineH) / 2;
+    // draw walls
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
+    double lineX = 0;
+    double lineH;
+    double offset;
+    while (!emptyQueue(wallsH))
+    {
+        distance = popQueueNode(wallsH);
+
+        lineH = SCREEN_HEIGHT * 8 / *distance;
+        offset = (SCREEN_HEIGHT - lineH) / 2;
         SDL_RenderDrawLine(renderer, lineX, offset, lineX, lineH + offset);
 
-        lineX += SCREEN_WIDTH / (FOV / (double)raysDiv);
+        lineX += SCREEN_WIDTH / FOV;
+        free(distance);
     }
-}
 
+    free(wallsH);
+}
 
 void loopFunc(Window *win)
 {
@@ -158,11 +166,11 @@ void loopFunc(Window *win)
     SDL_RenderClear(renderer);
     //
 
+    // draw rays
+    drawRays(renderer);
+
     // draw 2 map
     drawMap2D(renderer);
-
-    // draw rays
-    drawRay(renderer);
 
     // draw player
     drawPlayer(renderer);
