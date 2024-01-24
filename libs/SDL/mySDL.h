@@ -2,13 +2,14 @@
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 
-#define REFRESHRATE 1000/25 //1000/fps
+#define REFRESHRATE 1000 / 25 // 1000/fps
 #define FULLSCREEN false
+#define CURSOR false
 #define SCREEN_X 50
 #define SCREEN_Y 50
 
-int SCREEN_WIDTH = 1024;
-int SCREEN_HEIGHT = 768;
+int SCREEN_WIDTH = 800;
+int SCREEN_HEIGHT = 600;
 
 typedef struct
 {
@@ -50,6 +51,10 @@ Window *initWin(char *title)
     if (FULLSCREEN)
     {
         SDL_SetWindowFullscreen(newWin->win, FULLSCREEN);
+    }
+
+    if (!CURSOR)
+    {
         SDL_ShowCursor(0);
     }
 

@@ -1,5 +1,6 @@
 #define RADIANS M_PI / 180
 #define DEP 2 // move by fact
+#define SENS 3
 
 typedef struct
 {
@@ -19,7 +20,7 @@ typedef struct
 void rotatePlayer(Player *player, int a)
 {
     // angle update
-    player->a += a * 10;
+    player->a += a * SENS;
     if (player->a == 360)
     {
         player->a = 0;
@@ -69,8 +70,8 @@ void movePlayer(Player *player, int d)
     double newX = player->x + dirs[d][0] * DEP;
     double newY = player->y + dirs[d][1] * DEP;
 
-    int i = (newX + (dirs[d][0] > 0 ? 1 : -1) * DEP * 2 - worldX) / (double)UNIT2D;
-    int j = (newY + (dirs[d][1] > 0 ? 1 : -1) * DEP * 2 - worldY) / (double)UNIT2D;
+    int i = (newX + (dirs[d][0] > 0 ? 1 : -1) * DEP / 2 - worldX) / (double)UNIT2D;
+    int j = (newY + (dirs[d][1] > 0 ? 1 : -1) * DEP / 2 - worldY) / (double)UNIT2D;
 
     if (!world[i + j * 8])
     {
