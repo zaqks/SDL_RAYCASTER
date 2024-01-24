@@ -19,7 +19,7 @@ typedef struct
 void rotatePlayer(Player *player, int a)
 {
     // angle update
-    player->a += a;
+    player->a += a*15;
     if (player->a == 360)
     {
         player->a = 0;
@@ -58,31 +58,12 @@ Player *initPlayer()
 void movePlayer(Player *player, int d)
 {
     // 0 1 2 3
+    double dirs[4][2] = {
+        {player->ax, player->ay},
+        {player->ax2, player->ay2},
+        {-player->ax, -player->ay},
+        {-player->ax2, -player->ay2}};
 
-    switch (d)
-    {
-    case 0:
-        player->x += player->ax * DEP; // 1
-        player->y += player->ay * DEP; // 1
-        printf("forward\n");
-        break;
-    case 1:
-        player->x += player->ax2 * DEP; // 1
-        player->y += player->ay2 * DEP; // 1
-        printf("forward\n");
-        break;
-    case 2:
-        player->x -= player->ax * DEP; //-1
-        player->y -= player->ay * DEP; //-1
-        printf("backward\n");
-        break;
-    case 3:
-        player->x -= player->ax2 * DEP; // -1
-        player->y -= player->ay2 * DEP; // -1
-        break;
-    default:
-        break;
-    }
-
-    printf("%f %f\n", player->x, player->y);
+    player->x += dirs[d][0] * DEP;
+    player->y += dirs[d][1] * DEP;
 }
