@@ -33,6 +33,9 @@ void rotatePlayer(Player *player, int a)
     player->ax = sin(player->a * RADIANS);
     player->ay = -cos(player->a * RADIANS);
 
+    player->ax2 = sin((player->a + 90) * RADIANS);
+    player->ay2 = -cos((player->a + 90) * RADIANS);
+
     printf("\n%d deg\n", player->a);
     printf("%f\n", player->ax);
     printf("%f\n", player->ay);
@@ -46,8 +49,6 @@ Player *initPlayer()
     rslt->y = 250;
 
     rslt->a = 0;
-    rslt->ax = 0;
-    rslt->ay = 0;
 
     rotatePlayer(rslt, 0);
 
@@ -76,7 +77,8 @@ void movePlayer(Player *player, int d)
         printf("backward\n");
         break;
     case 3:
-        /* code */
+        player->x -= player->ax2 * DEP; // -1
+        player->y -= player->ay2 * DEP; // -1
         break;
     default:
         break;
