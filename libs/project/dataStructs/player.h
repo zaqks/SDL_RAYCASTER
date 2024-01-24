@@ -36,17 +36,19 @@ void rotatePlayer(Player *player, int a)
     player->ax2 = sin((player->a + 90) * RADIANS);
     player->ay2 = -cos((player->a + 90) * RADIANS);
 
+    /*
     printf("\n%d deg\n", player->a);
     printf("%f\n", player->ax);
     printf("%f\n", player->ay);
+    */
 }
 
 Player *initPlayer()
 {
     Player *rslt = (Player *)malloc(sizeof(Player));
 
-    rslt->x = 250;
-    rslt->y = 250;
+    rslt->x = 225;
+    rslt->y = 225;
 
     rslt->a = 0;
 
@@ -67,3 +69,4 @@ void movePlayer(Player *player, int d)
     player->x += dirs[d][0] * DEP;
     player->y += dirs[d][1] * DEP;
 }
+

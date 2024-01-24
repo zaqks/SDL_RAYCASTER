@@ -1,5 +1,5 @@
-int worldX = 50;
-int worldY = 50;
+int worldX = 0;
+int worldY = 0;
 
 int world[] = {
     1, 1, 1, 1, 1, 1, 1, 1,

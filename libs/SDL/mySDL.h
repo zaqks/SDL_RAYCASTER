@@ -4,9 +4,11 @@
 
 #define REFRESHRATE 33
 #define FULLSCREEN false
+#define SCREEN_X 50
+#define SCREEN_Y 50
 
-int SCREEN_WIDTH = 800;
-int SCREEN_HEIGHT = 600;
+int SCREEN_WIDTH = 1024;
+int SCREEN_HEIGHT = 768;
 
 typedef struct
 {
@@ -43,7 +45,7 @@ Window *initWin(char *title)
         newTitle = title;
     }
 
-    newWin->win = SDL_CreateWindow(newTitle, 10, 10, newWin->width, newWin->height, SDL_WINDOW_SHOWN);
+    newWin->win = SDL_CreateWindow(newTitle, SCREEN_X, SCREEN_Y, newWin->width, newWin->height, SDL_WINDOW_SHOWN);
 
     if (FULLSCREEN)
     {

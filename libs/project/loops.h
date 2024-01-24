@@ -92,6 +92,51 @@ void drawPlayer(SDL_Renderer *renderer)
     SDL_RenderDrawLine(renderer, px, py, px + player->ax * unit, py + player->ay * unit);
 }
 
+void drawRay(SDL_Renderer *renderer)
+{
+    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+
+    const int FOV = 90;    
+    int drawDistance;
+
+    double ax;
+    double ay;
+
+    double x2;
+    double y2;
+
+    for (int a = player->a - FOV/2; a < player->a + FOV/2; a++) // draw multiple rays (10)
+    {
+        drawDistance = 10;
+
+        ax = sin(a * RADIANS);
+        ay = -cos(a * RADIANS);
+
+        x2 = player->x + ax * drawDistance;
+        y2 = player->y + ay * drawDistance;
+
+        // normalize the coords
+        int i = x2 / UNIT2D;
+        int j = y2 / UNIT2D;
+
+        while (!world[i + j * 8]) // wall not found
+        {
+            drawDistance += 10;
+            // extend the ray if the wall is not found
+            x2 = player->x + ax * drawDistance;
+            y2 = player->y + ay * drawDistance;
+
+            // normalize the coords
+            i = x2 / UNIT2D;
+            j = y2 / UNIT2D;
+        }
+
+        // wall found
+
+        SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+    }
+}
+
 void loopFunc(Window *win)
 {
     //
@@ -104,6 +149,9 @@ void loopFunc(Window *win)
 
     // draw player
     drawPlayer(renderer);
+
+    // draw rays
+    drawRay(renderer);
 
     //
     SDL_RenderPresent(renderer);
