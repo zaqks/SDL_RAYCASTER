@@ -19,7 +19,7 @@ typedef struct
 void rotatePlayer(Player *player, int a)
 {
     // angle update
-    player->a += a*15;
+    player->a += a * 10;
     if (player->a == 360)
     {
         player->a = 0;
@@ -66,7 +66,15 @@ void movePlayer(Player *player, int d)
         {-player->ax, -player->ay},
         {-player->ax2, -player->ay2}};
 
-    player->x += dirs[d][0] * DEP;
-    player->y += dirs[d][1] * DEP;
-}
+    double newX = player->x + dirs[d][0] * DEP;
+    double newY = player->y + dirs[d][1] * DEP;
 
+    int i = (newX + (dirs[d][0] > 0 ? 1 : -1) * DEP * 2) / (double)UNIT2D;
+    int j = (newY + (dirs[d][1] > 0 ? 1 : -1) * DEP * 2) / (double)UNIT2D;
+
+    if (!world[i + j * 8])
+    {
+        player->x = newX;
+        player->y = newY;
+    }
+}

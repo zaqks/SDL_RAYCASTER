@@ -1,3 +1,5 @@
+#define UNIT2D 50
+
 int worldX = 0;
 int worldY = 0;
 
@@ -13,4 +15,3 @@ int world[] = {
 
 
 
-Player *player;
