@@ -5,6 +5,9 @@ int main()
     win = initWin("DOOM");
     renderer = win->renderer;
 
+    //init map
+    initWorld();
+
     // init player
     player = initPlayer();
 
