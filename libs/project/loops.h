@@ -1,3 +1,4 @@
+int moving = -1;
 int keys[4] = {SDLK_w, SDLK_d, SDLK_s, SDLK_a};
 
 void eventFunc(SDL_Event e)
@@ -20,13 +21,17 @@ void eventFunc(SDL_Event e)
             {
                 if (keys[i] == e.key.keysym.sym)
                 {
-                    movePlayer(player, i);
+                    moving = i;
                     break;
                 }
             }
 
             break;
         }
+    }
+    if (e.type == SDL_KEYUP)
+    {
+        moving = -1;
     }
 
     if (e.type == SDL_MOUSEMOTION)
@@ -90,11 +95,10 @@ void drawPlayer(SDL_Renderer *renderer)
 
 void drawRays(SDL_Renderer *renderer)
 {
-    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
 
-    const int FOV = 135;
+    const int FOV = 61; // FOV rays
 
-    int drawFact;
+    int currentDistFact;
 
     double ax;
     double ay;
@@ -102,48 +106,7 @@ void drawRays(SDL_Renderer *renderer)
     double x2;
     double y2;
 
-    double *distance;
-    Queue *walls = initQueue();
-
-    int clr;
-
-    for (int a = player->a - FOV / 2; a < player->a + FOV / 2; a += 1) // draw multiple rays (10)
-    {
-        drawFact = DEP * 2;
-
-        ax = sin(a * RADIANS);
-        ay = -cos(a * RADIANS);
-
-        x2 = player->x + ax * drawFact;
-        y2 = player->y + ay * drawFact;
-
-        // normalize the coords
-        int i = (x2 - worldX) / UNIT2D;
-        int j = (y2 - worldY) / UNIT2D;
-
-        while (!world[i + j * 8]) // wall not found
-        {
-            drawFact += DEP;
-            // extend the ray if the wall is not found
-            x2 = player->x + ax * drawFact;
-            y2 = player->y + ay * drawFact;
-
-            // normalize the coords
-            i = (x2 - worldX) / UNIT2D;
-            j = (y2 - worldY) / UNIT2D;
-        }
-
-        // wall found
-        SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2); // draw ray
-
-        // wall distance
-        distance = (double *)malloc(sizeof(double));
-        *distance = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
-        pushQueueNode(walls, distance);
-    }
-
-    // draw wall
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    double distance;
 
     double lineX = 0;
     double lineXS = SCREEN_WIDTH / (double)FOV;
@@ -151,11 +114,44 @@ void drawRays(SDL_Renderer *renderer)
     double lineH;
     double offset;
 
-    for (int a = player->a - FOV / 2; a < player->a + FOV / 2; a += 1)
+    for (int a = player->a - FOV / 2; a < player->a + FOV / 2; a += 1) // draw multiple rays (10)
     {
-        distance = popQueueNode(walls);
-        *distance *= cos(RADIANS * (player->a - a));
-        lineH = SCREEN_HEIGHT * 8 / *distance;
+        currentDistFact = 1;
+
+        ax = sin(a * RADIANS);
+        ay = -cos(a * RADIANS);
+
+        x2 = player->x + ax * currentDistFact;
+        y2 = player->y + ay * currentDistFact;
+
+        // normalize the coords
+        int i = (x2 - worldX) / UNIT2D;
+        int j = (y2 - worldY) / UNIT2D;
+
+        while (!world[i + j * 8]) // wall not found
+        {
+            currentDistFact += 1;
+            // extend the ray if the wall is not found
+            x2 = player->x + ax * currentDistFact;
+            y2 = player->y + ay * currentDistFact;
+
+            // normalize the coords
+            i = (x2 - worldX) / (double)UNIT2D;
+            j = (y2 - worldY) / (double)UNIT2D;
+        }
+
+        // wall found
+        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+        SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2); // draw ray
+
+        // wall distance
+        distance = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
+
+        // draw wall
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+
+        distance *= cos(RADIANS * (player->a - a));
+        lineH = SCREEN_HEIGHT * 8 / distance;
         offset = (SCREEN_HEIGHT - lineH) / (double)2;
 
         for (double i = 0; i < lineXS; i++)
@@ -163,10 +159,8 @@ void drawRays(SDL_Renderer *renderer)
             SDL_RenderDrawLine(renderer, lineX + i, offset, lineX + i, offset + lineH);
         }
 
-        free(distance);
         lineX += lineXS;
     }
-    free(walls);
 }
 
 void drawCenterSight(SDL_Renderer *renderer)
@@ -182,6 +176,12 @@ void drawCenterSight(SDL_Renderer *renderer)
 
 void loopFunc(Window *win)
 {
+    // move
+    if (moving >= 0)
+    {
+        movePlayer(player, moving);
+    }
+
     //
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
@@ -192,8 +192,7 @@ void loopFunc(Window *win)
 
     // draw 2 map
     drawMap2D(renderer);
-    // draw player
-    drawPlayer(renderer);
+    drawPlayer(renderer); // draw player
 
     drawCenterSight(renderer);
 

@@ -2,7 +2,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <stdbool.h>
 
-#define REFRESHRATE 1000 / 25 // 1000/fps
+#define REFRESHRATE 1000 / 30 // 1000/fps
 #define FULLSCREEN false
 #define CURSOR false
 #define SCREEN_X 50
