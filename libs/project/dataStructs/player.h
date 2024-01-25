@@ -67,8 +67,9 @@ void movePlayer(Player *player, int d)
         {-player->ax, -player->ay},
         {-player->ax2, -player->ay2}};
 
+    // x
     double newX = player->x + dirs[d][0] * DEP;
-    double newY = player->y + dirs[d][1] * DEP;
+    double newY = player->y;
 
     int i = (newX + (dirs[d][0] > 0 ? 1 : -1) * DEP / 2 - worldX) / (double)UNIT2D;
     int j = (newY + (dirs[d][1] > 0 ? 1 : -1) * DEP / 2 - worldY) / (double)UNIT2D;
@@ -76,6 +77,17 @@ void movePlayer(Player *player, int d)
     if (!world[i + j * 8])
     {
         player->x = newX;
+    }
+
+    // y
+    newX = player->x;
+    newY = player->y + dirs[d][1] * DEP;
+
+    i = (newX + (dirs[d][0] > 0 ? 1 : -1) * DEP / 2 - worldX) / (double)UNIT2D;
+    j = (newY + (dirs[d][1] > 0 ? 1 : -1) * DEP / 2 - worldY) / (double)UNIT2D;
+
+    if (!world[i + j * 8])
+    {
         player->y = newY;
     }
 }
