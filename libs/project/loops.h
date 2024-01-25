@@ -1,4 +1,4 @@
-bool update = true;
+
 int moving = -1;
 
 int keys[4] = {SDLK_w, SDLK_d, SDLK_s, SDLK_a};
@@ -12,11 +12,11 @@ void eventFunc(SDL_Event e)
             // rotation
         case SDLK_RIGHT:
             rotatePlayer(player, 1);
-            update = true;
+
             break;
         case SDLK_LEFT:
             rotatePlayer(player, -1);
-            update = true;
+
             break;
 
         default:
@@ -26,7 +26,7 @@ void eventFunc(SDL_Event e)
                 if (keys[i] == e.key.keysym.sym)
                 {
                     moving = i;
-                    update = true;
+
                     break;
                 }
             }
@@ -42,7 +42,6 @@ void eventFunc(SDL_Event e)
     if (e.type == SDL_MOUSEMOTION)
     {
         rotatePlayer(player, e.motion.xrel > 0 ? 1 : -1);
-        update = true;
     }
 }
 
@@ -182,25 +181,20 @@ void loopFunc(Window *win)
         movePlayer(player, moving);
     }
 
-    if (update)
-    {
-        //
-        SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
-        SDL_RenderClear(renderer);
-        //
+    //
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    //
 
-        // draw rays
-        drawRays(renderer);
+    // draw rays
+    drawRays(renderer);
 
-        // draw 2 map
-        drawMap2D(renderer);
-        drawPlayer(renderer); // draw player
+    // draw 2 map
+    drawMap2D(renderer);
+    drawPlayer(renderer); // draw player
 
-        drawCenterSight(renderer);
+    drawCenterSight(renderer);
 
-        //
-        SDL_RenderPresent(renderer);
-
-        update = false;
-    }
+    //
+    SDL_RenderPresent(renderer);
 }
