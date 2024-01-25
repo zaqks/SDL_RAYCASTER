@@ -105,7 +105,9 @@ void drawRays(SDL_Renderer *renderer)
     double *distance;
     Queue *walls = initQueue();
 
-    for (double a = player->a - FOV / 2; a < player->a + FOV / 2; a += 1) // draw multiple rays (10)
+    int clr;
+
+    for (int a = player->a - FOV / 2; a < player->a + FOV / 2; a += 1) // draw multiple rays (10)
     {
         drawFact = DEP * 2;
 
@@ -137,7 +139,6 @@ void drawRays(SDL_Renderer *renderer)
         // wall distance
         distance = (double *)malloc(sizeof(double));
         *distance = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
-
         pushQueueNode(walls, distance);
     }
 
@@ -150,14 +151,17 @@ void drawRays(SDL_Renderer *renderer)
     double lineH;
     double offset;
 
-    while (!emptyQueue(walls))
+    for (int a = player->a - FOV / 2; a < player->a + FOV / 2; a += 1)
     {
         distance = popQueueNode(walls);
-
+        *distance *= cos(RADIANS * (player->a - a));
         lineH = SCREEN_HEIGHT * 8 / *distance;
         offset = (SCREEN_HEIGHT - lineH) / (double)2;
 
-        SDL_RenderDrawLine(renderer, lineX, offset, lineX, offset + lineH);
+        for (double i = 0; i < lineXS; i++)
+        {
+            SDL_RenderDrawLine(renderer, lineX + i, offset, lineX + i, offset + lineH);
+        }
 
         free(distance);
         lineX += lineXS;
