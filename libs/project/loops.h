@@ -1,4 +1,6 @@
+bool update = true;
 int moving = -1;
+
 int keys[4] = {SDLK_w, SDLK_d, SDLK_s, SDLK_a};
 
 void eventFunc(SDL_Event e)
@@ -10,9 +12,11 @@ void eventFunc(SDL_Event e)
             // rotation
         case SDLK_RIGHT:
             rotatePlayer(player, 1);
+            update = true;
             break;
         case SDLK_LEFT:
             rotatePlayer(player, -1);
+            update = true;
             break;
 
         default:
@@ -22,6 +26,7 @@ void eventFunc(SDL_Event e)
                 if (keys[i] == e.key.keysym.sym)
                 {
                     moving = i;
+                    update = true;
                     break;
                 }
             }
@@ -37,6 +42,7 @@ void eventFunc(SDL_Event e)
     if (e.type == SDL_MOUSEMOTION)
     {
         rotatePlayer(player, e.motion.xrel > 0 ? 1 : -1);
+        update = true;
     }
 }
 
@@ -73,32 +79,23 @@ void drawPlayer(SDL_Renderer *renderer)
     // draw body
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 
-    const int unit = DEP;
+    SDL_RenderDrawPoint(renderer, player->x, player->y);
 
-    SDL_Rect rect;
-    rect.x = player->x - unit / 2;
-    rect.y = player->y - unit / 2;
-    rect.w = unit;
-    rect.h = unit;
-
-    SDL_RenderFillRect(renderer, &rect);
-    SDL_RenderDrawRect(renderer, &rect);
-
-    // draw sight
-
+    /*
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
     int px = player->x;
     int py = player->y;
     SDL_RenderDrawLine(renderer, px, py, px + player->ax * unit, py + player->ay * unit);
+    */
 }
 
 void drawRays(SDL_Renderer *renderer)
 {
 
-    const int FOV = 61; // FOV rays
+    const int FOV = 59; // FOV rays
 
-    int currentDistFact;
+    double currentDist;
 
     double ax;
     double ay;
@@ -114,15 +111,15 @@ void drawRays(SDL_Renderer *renderer)
     double lineH;
     double offset;
 
-    for (int a = player->a - FOV / 2; a < player->a + FOV / 2; a += 1) // draw multiple rays (10)
+    for (int a = player->a - FOV / 2; a < player->a + FOV / 2; a += 1) // draw multiple rays (80)
     {
-        currentDistFact = 1;
+        currentDist = 1;
 
         ax = sin(a * RADIANS);
         ay = -cos(a * RADIANS);
 
-        x2 = player->x + ax * currentDistFact;
-        y2 = player->y + ay * currentDistFact;
+        x2 = player->x + ax;
+        y2 = player->y + ay;
 
         // normalize the coords
         int i = (x2 - worldX) / UNIT2D;
@@ -130,10 +127,12 @@ void drawRays(SDL_Renderer *renderer)
 
         while (!world[i + j * 8]) // wall not found
         {
-            currentDistFact += 1;
-            // extend the ray if the wall is not found
-            x2 = player->x + ax * currentDistFact;
-            y2 = player->y + ay * currentDistFact;
+            currentDist += 0.1;
+            ax = sin(a * RADIANS) * currentDist;
+            ay = -cos(a * RADIANS) * currentDist;
+
+            x2 = player->x + ax;
+            y2 = player->y + ay;
 
             // normalize the coords
             i = (x2 - worldX) / (double)UNIT2D;
@@ -145,13 +144,14 @@ void drawRays(SDL_Renderer *renderer)
         SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2); // draw ray
 
         // wall distance
-        distance = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
+        // distance = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
+        distance = currentDist;
 
         // draw wall
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
         distance *= cos(RADIANS * (player->a - a));
-        lineH = SCREEN_HEIGHT * 8 / distance;
+        lineH = SCREEN_HEIGHT * 10 / distance;
         offset = (SCREEN_HEIGHT - lineH) / (double)2;
 
         for (double i = 0; i < lineXS; i++)
@@ -182,20 +182,25 @@ void loopFunc(Window *win)
         movePlayer(player, moving);
     }
 
-    //
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-    //
+    if (update)
+    {
+        //
+        SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
+        SDL_RenderClear(renderer);
+        //
 
-    // draw rays
-    drawRays(renderer);
+        // draw rays
+        drawRays(renderer);
 
-    // draw 2 map
-    drawMap2D(renderer);
-    drawPlayer(renderer); // draw player
+        // draw 2 map
+        drawMap2D(renderer);
+        drawPlayer(renderer); // draw player
 
-    drawCenterSight(renderer);
+        drawCenterSight(renderer);
 
-    //
-    SDL_RenderPresent(renderer);
+        //
+        SDL_RenderPresent(renderer);
+
+        update = false;
+    }
 }
