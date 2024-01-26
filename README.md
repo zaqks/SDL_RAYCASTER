@@ -1,4 +1,4 @@
-<h1>SDL RAYCASTER</h1>
+<h1>SDL RAYCASTER V1</h1>
 
 <ul>
     <li>vertical & horizontal ray casting merged</li>
