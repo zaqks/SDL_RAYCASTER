@@ -135,9 +135,16 @@ void drawRays(SDL_Renderer *renderer)
         double dx;
         double dy;
 
-        double x2;
-        double y2;
+        double x2; // h
+        double y2; // h
+        double d2 = 0;
 
+        double x3; // v
+        double y3; // v
+        double d3 = 0;
+
+        int i;
+        int j;
         int indx;
 
         double dx2;
@@ -155,7 +162,9 @@ void drawRays(SDL_Renderer *renderer)
             x2 = player->x + dx * lUP;
             y2 = player->y - dy * lUP; // invert the y
 
-            indx = x2 / UNIT2D + 8 * (y2 / UNIT2D - (lUP == 1 ? 1 : 0));
+            i = x2 / UNIT2D;
+            j = y2 / UNIT2D - (lUP == 1 ? 1 : 0);
+            indx = i + 8 * j;
 
             dy2 = UNIT2D;
             dx2 = dy2 * ta;
@@ -164,14 +173,20 @@ void drawRays(SDL_Renderer *renderer)
             {
                 x2 += dx2 * lUP;
                 y2 -= dy2 * lUP;
-                indx = x2 / UNIT2D + 8 * (y2 / UNIT2D - (lUP == 1 ? 1 : 0));
-                if (indx > 63)
+
+                i = x2 / UNIT2D;
+                j = y2 / UNIT2D - (lUP == 1 ? 1 : 0);
+                indx = i + 8 * j;
+
+                if (indx > 63 || indx < 0)
                 {
                     break;
                 }
             }
 
-            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+            d2 = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
+
+            // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
             // SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
         }
 
@@ -182,27 +197,54 @@ void drawRays(SDL_Renderer *renderer)
             dx = (lRH == 1 ? UNIT2D - rX : rX);
             dy = dx / ta;
 
-            x2 = player->x + dx * lRH;
-            y2 = player->y - dy * lRH;
+            x3 = player->x + dx * lRH;
+            y3 = player->y - dy * lRH;
 
-            indx = x2 / UNIT2D - (lRH == 1 ? 0 : 1) + 8 * (y2 / UNIT2D);
+            i = x3 / UNIT2D - (lRH == 1 ? 0 : 1);
+            j = y3 / UNIT2D;
+            indx = i + 8 * j;
 
             dx2 = UNIT2D;
             dy2 = dx2 / ta;
 
             while (!world[indx])
             {
-                x2 += dx2 * lRH;
-                y2 -= dy2 * lRH;
-                indx = x2 / UNIT2D - (lRH == 1 ? 0 : 1) + 8 * (y2 / UNIT2D);
-                if (indx > 63)
+                x3 += dx2 * lRH;
+                y3 -= dy2 * lRH;
+
+                i = x3 / UNIT2D - (lRH == 1 ? 0 : 1);
+                j = y3 / UNIT2D;
+                indx = i + 8 * j;
+
+                if (indx > 63 || indx < 0)
                 {
                     break;
                 }
             }
 
-            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+            d3 = pow(pow(x3 - player->x, 2) + pow(y3 - player->y, 2), 0.5);
+
+            // SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+            // SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
+        }
+
+        // get the shortest distance and draw
+        /*
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+        SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
+        */
+
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        if (d2 < d3)
+        {
             SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+        }
+        else
+        {
+            SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
         }
     }
 }
