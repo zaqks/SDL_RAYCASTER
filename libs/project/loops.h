@@ -1,4 +1,4 @@
-#define FOV 60
+#define FOV 61
 #define FOV2 FOV / 2
 
 #define MOUSE false
@@ -296,7 +296,7 @@ void drawRays(SDL_Renderer *renderer)
 
             for (double x = 0; x < lineXS; x++)
             {
-                SDL_RenderDrawLine(renderer, lineX + i, yOffset, lineX + i, yOffset + lineH);
+                SDL_RenderDrawLine(renderer, lineX + x, yOffset, lineX + x, yOffset + lineH);
             }
             lineX += lineXS;
         }
