@@ -106,39 +106,105 @@ void drawPlayer(SDL_Renderer *renderer)
 
 void drawRays(SDL_Renderer *renderer)
 {
-    if (abs(player->a) != 90) // horizontal intersection (don't check for |90deg| ya l boubou)
+    bool vert = true;
+    bool horz = true;
 
+    for (int a = 0; a < 4; a++) // a%2 0 vert 1 horz
     {
+        if (abs(player->a) == a * 90)
+        {
+            if (a % 2) // horz
+            {
+                horz = false;
+            }
+            else // vert
+            {
+                vert = false;
+            }
+        }
+    }
+
+    if (horz || vert) // check if we need to init the vars
+    {
+
         int rX = (int)player->x % UNIT2D;
         int rY = (int)player->y % UNIT2D;
 
-        int up = ((abs(player->a) <= 90 || abs(player->a) >= 270) ? 1 : -1); // are we looking up or down :/
-
         double ta = tan(RADIANS * (player->a));
-        double dy = (up == 1 ? rY : UNIT2D - rY);
-        double dx = dy * ta;
 
-        double x2 = player->x + dx * up;
-        double y2 = player->y - dy * up; // invert the y
+        double dx;
+        double dy;
 
-        int i = x2 / UNIT2D;
-        int j = y2 / UNIT2D - (up == 1 ? 1 : 0);
+        double x2;
+        double y2;
 
-        double dy2 = UNIT2D;
-        double dx2 = dy2 * ta;
+        int indx;
 
-        while (!world[i + j * 8])
+        double dx2;
+        double dy2;
+
+        if (horz) // horizontal intersection (don't check for |90deg| ya l boubou)
+
         {
-            x2 += dx2 * up;
-            y2 -= dy2 * up;
-            i = x2 / UNIT2D;
-            j = y2 / UNIT2D - (up == 1 ? 1 : 0);
+            // int lUP = ((abs(player->a) <= 90 || abs(player->a) >= 270) ? 1 : -1); // are we looking UP or down :/
+            int lUP = -player->ay / fabs(player->ay);
+
+            dy = (lUP == 1 ? rY : UNIT2D - rY);
+            dx = dy * ta;
+
+            x2 = player->x + dx * lUP;
+            y2 = player->y - dy * lUP; // invert the y
+
+            indx = x2 / UNIT2D + 8 * (y2 / UNIT2D - (lUP == 1 ? 1 : 0));
+
+            dy2 = UNIT2D;
+            dx2 = dy2 * ta;
+
+            while (!world[indx])
+            {
+                x2 += dx2 * lUP;
+                y2 -= dy2 * lUP;
+                indx = x2 / UNIT2D + 8 * (y2 / UNIT2D - (lUP == 1 ? 1 : 0));
+                if (indx > 63)
+                {
+                    break;
+                }
+            }
+
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+            // SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
         }
 
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+        if (vert) // vertical intersection}
+        {
+            int lRH = player->ax / fabs(player->ax);
+
+            dx = (lRH == 1 ? UNIT2D - rX : rX);
+            dy = dx / ta;
+
+            x2 = player->x + dx * lRH;
+            y2 = player->y - dy * lRH;
+
+            indx = x2 / UNIT2D - (lRH == 1 ? 0 : 1) + 8 * (y2 / UNIT2D);
+
+            dx2 = UNIT2D;
+            dy2 = dx2 / ta;
+
+            while (!world[indx])
+            {
+                x2 += dx2 * lRH;
+                y2 -= dy2 * lRH;
+                indx = x2 / UNIT2D - (lRH == 1 ? 0 : 1) + 8 * (y2 / UNIT2D);
+                if (indx > 63)
+                {
+                    break;
+                }
+            }
+
+            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+            SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+        }
     }
-    // vertical intersection}
 }
 
 void drawCenterSight(SDL_Renderer *renderer)
