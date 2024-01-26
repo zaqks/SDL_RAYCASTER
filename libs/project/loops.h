@@ -1,4 +1,6 @@
 #define FOV 60
+#define FOV2 FOV / 2
+
 #define MOUSE false
 
 int moving = -1;
@@ -108,8 +110,43 @@ void drawPlayer(SDL_Renderer *renderer)
 
 void drawRays(SDL_Renderer *renderer)
 {
+
+    int rX = (int)player->x % UNIT2D;
+    int rY = (int)player->y % UNIT2D;
+
     int angle;
-    for (int angleR = -FOV / 2; angleR < FOV / 2; angleR++)
+    double ca;
+    double sa;
+    double ta;
+
+    double dx;
+    double dy;
+
+    double x2; // h
+    double y2; // h
+    double d2;
+
+    double x3; // v
+    double y3; // v
+    double d3;
+
+    double wd;
+
+    int i;
+    int j;
+    int indx;
+
+    double dx2;
+    double dy2;
+
+    // 3D
+    double lineH;
+    double yOffset;
+
+    double lineX = 0;
+    double lineXS = SCREEN_WIDTH / (double)FOV;
+
+    for (int angleR = -FOV2; angleR < FOV2; angleR++)
     {
         angle = player->a + angleR;
         bool vert = true;
@@ -135,30 +172,9 @@ void drawRays(SDL_Renderer *renderer)
         if (horz || vert) // check if we need to init the vars
         {
 
-            int rX = (int)player->x % UNIT2D;
-            int rY = (int)player->y % UNIT2D;
-
-            double ca = cos(RADIANS * angle);
-            double sa = sin(RADIANS * angle);
-            double ta = sa / ca;
-
-            double dx;
-            double dy;
-
-            double x2; // h
-            double y2; // h
-            double d2;
-
-            double x3; // v
-            double y3; // v
-            double d3;
-
-            int i;
-            int j;
-            int indx;
-
-            double dx2;
-            double dy2;
+            ca = cos(RADIANS * angle);
+            sa = sin(RADIANS * angle);
+            ta = sa / ca;
 
             if (horz) // horizontal intersection (don't check for |90deg| ya l boubou)
 
@@ -236,36 +252,53 @@ void drawRays(SDL_Renderer *renderer)
 
             // get the shortest distance if necessary and draw
             SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+
+            if (horz)
+            {
+                d2 = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
+
+                if (!vert)
+                {
+                    wd = d2;
+                    SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+                }
+
+                // printf("x2, y2 %f %f\n", x2, y2);
+            }
+            if (vert)
+            {
+                d3 = pow(pow(x3 - player->x, 2) + pow(y3 - player->y, 2), 0.5);
+                if (!horz)
+                {
+                    wd = d3;
+                    SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
+                }
+                // printf("x3, y3 %f %f\n", x3, y3);
+            }
+
             if (horz && vert)
             {
-
-                d2 = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
-                d3 = pow(pow(x3 - player->x, 2) + pow(y3 - player->y, 2), 0.5);
-
+                wd = fmin(d2, d3);
                 if (d2 < d3)
                 {
                     SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
-                    // printf("x2, y2 %f %f\n", x2, y2);
                 }
                 else
                 {
                     SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
-                    // printf("x3, y3 %f %f\n", x3, y3);
                 }
             }
-            else
+
+            // 3D drawing
+            wd *= cos(RADIANS * (player->a - angle)); // fish eye
+            lineH = SCREEN_HEIGHT * 10 / wd;
+            yOffset = (SCREEN_HEIGHT - lineH) / (double)2;
+
+            for (double x = 0; x < lineXS; x++)
             {
-                if (horz)
-                {
-                    SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
-                    // printf("x2, y2 %f %f\n", x2, y2);
-                }
-                else
-                {
-                    SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
-                    // printf("x3, y3 %f %f\n", x3, y3);
-                }
+                SDL_RenderDrawLine(renderer, lineX + i, yOffset, lineX + i, yOffset + lineH);
             }
+            lineX += lineXS;
         }
     }
 }
@@ -307,7 +340,7 @@ void loopFunc(Window *win)
     // draw rays
     drawRays(renderer);
 
-    // drawCenterSight(renderer);
+     drawCenterSight(renderer);
 
     //
     SDL_RenderPresent(renderer);
