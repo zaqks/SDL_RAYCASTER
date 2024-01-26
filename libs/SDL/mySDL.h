@@ -53,10 +53,7 @@ Window *initWin(char *title)
         SDL_SetWindowFullscreen(newWin->win, FULLSCREEN);
     }
 
-    if (!CURSOR)
-    {
-        SDL_ShowCursor(0);
-    }
+    SDL_ShowCursor(CURSOR);
 
     newWin->renderer = SDL_CreateRenderer(newWin->win, -1, 0);
     SDL_SetRenderDrawColor(newWin->renderer, 0, 0, 0, 255);

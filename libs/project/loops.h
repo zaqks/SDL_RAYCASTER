@@ -1,4 +1,6 @@
+#define FOV 60
 #define MOUSE false
+
 int moving = -1;
 int rotating = 0;
 
@@ -106,168 +108,163 @@ void drawPlayer(SDL_Renderer *renderer)
 
 void drawRays(SDL_Renderer *renderer)
 {
-    bool vert = true;
-    bool horz = true;
-
-    for (int a = 0; a < 4; a++) // a%2 0 vert 1 horz
+    int angle;
+    for (int angleR = -FOV / 2; angleR < FOV / 2; angleR++)
     {
-        if (abs(player->a) == a * 90)
+        angle = player->a + angleR;
+        bool vert = true;
+        bool horz = true;
+
+        for (int a = 0; a < 4; a++) // a%2 0 vert 1 horz
         {
-            if (a % 2) // horz
+            if (abs(angle) == a * 90)
             {
-                horz = false;
-            }
-            else // vert
-            {
-                vert = false;
-            }
-        }
-    }
-
-    //printf(horz ? "horz\n" : (vert ? "vert\n" : "nada\n"));
-
-    if (horz || vert) // check if we need to init the vars
-    {
-
-        int rX = (int)player->x % UNIT2D;
-        int rY = (int)player->y % UNIT2D;
-
-        double ta = tan(RADIANS * (player->a));
-
-        double dx;
-        double dy;
-
-        double x2; // h
-        double y2; // h
-        double d2;
-
-        double x3; // v
-        double y3; // v
-        double d3;
-
-        int i;
-        int j;
-        int indx;
-
-        double dx2;
-        double dy2;
-
-        if (horz) // horizontal intersection (don't check for |90deg| ya l boubou)
-
-        {
-            // int lUP = ((abs(player->a) <= 90 || abs(player->a) >= 270) ? 1 : -1); // are we looking UP or down :/
-            int lUP = -player->ay / fabs(player->ay);
-
-            dy = (lUP == 1 ? rY : UNIT2D - rY);
-            dx = dy * ta;
-
-            x2 = player->x + dx * lUP;
-            y2 = player->y - dy * lUP; // invert the y
-
-            i = x2 / UNIT2D;
-            j = y2 / UNIT2D - (lUP == 1 ? 1 : 0);
-            indx = i + 8 * j;
-
-            dy2 = UNIT2D;
-            dx2 = dy2 * ta;
-
-            while (!world[indx])
-            {
-                x2 += dx2 * lUP;
-                y2 -= dy2 * lUP;
-
-                i = x2 / UNIT2D;
-                j = y2 / UNIT2D - (lUP == 1 ? 1 : 0);
-                indx = i + 8 * j;
-
-                if (indx > 63 || indx < 0)
+                if (a % 2) // horz
                 {
-                    break;
+                    horz = false;
+                }
+                else // vert
+                {
+                    vert = false;
                 }
             }
-
-            // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-            // SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
         }
 
-        if (vert) // vertical intersection}
+        // printf(horz ? "horz\n" : (vert ? "vert\n" : "nada\n"));
+
+        if (horz || vert) // check if we need to init the vars
         {
-            int lRH = player->ax / fabs(player->ax);
 
-            dx = (lRH == 1 ? UNIT2D - rX : rX);
-            dy = dx / ta;
+            int rX = (int)player->x % UNIT2D;
+            int rY = (int)player->y % UNIT2D;
 
-            x3 = player->x + dx * lRH;
-            y3 = player->y - dy * lRH;
+            double ca = cos(RADIANS * angle);
+            double sa = sin(RADIANS * angle);
+            double ta = sa / ca;
 
-            i = x3 / UNIT2D - (lRH == 1 ? 0 : 1);
-            j = y3 / UNIT2D;
-            indx = i + 8 * j;
+            double dx;
+            double dy;
 
-            dx2 = UNIT2D;
-            dy2 = dx2 / ta;
+            double x2; // h
+            double y2; // h
+            double d2;
 
-            while (!world[indx])
+            double x3; // v
+            double y3; // v
+            double d3;
+
+            int i;
+            int j;
+            int indx;
+
+            double dx2;
+            double dy2;
+
+            if (horz) // horizontal intersection (don't check for |90deg| ya l boubou)
+
             {
-                x3 += dx2 * lRH;
-                y3 -= dy2 * lRH;
+                // int lUP = ((abs(player->a) <= 90 || abs(player->a) >= 270) ? 1 : -1); // are we looking UP or down :/
+                int lUP = ca / fabs(-ca);
 
-                i = x3 / UNIT2D - (lRH == 1 ? 0 : 1);
-                j = y3 / UNIT2D;
+                dy = (lUP == 1 ? rY : UNIT2D - rY);
+                dx = dy * ta;
+
+                x2 = player->x + dx * lUP;
+                y2 = player->y - dy * lUP; // invert the y
+
+                i = (x2 - worldX) / UNIT2D;
+                j = (y2 - worldY) / UNIT2D - (lUP == 1 ? 1 : 0);
                 indx = i + 8 * j;
 
-                if (indx > 63 || indx < 0)
+                dy2 = UNIT2D;
+                dx2 = dy2 * ta;
+
+                while (!world[indx])
                 {
-                    break;
+                    x2 += dx2 * lUP;
+                    y2 -= dy2 * lUP;
+
+                    i = (x2 - worldX) / UNIT2D;
+                    j = (y2 - worldY) / UNIT2D - (lUP == 1 ? 1 : 0);
+                    indx = i + 8 * j;
+
+                    if (indx > 63 || indx < 0)
+                    {
+                        break;
+                    }
                 }
+
+                // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+                // SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
             }
 
-            // SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-            // SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
-        }
-
-        // get the shortest distance and draw
-        /*
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
-
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-        SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
-        */
-
-        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-
-        //printf("dh %f\n", d2);
-        //printf("dv %f\n", d3);
-
-        if (horz && vert)
-        {
-
-            d2 = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
-            d3 = pow(pow(x3 - player->x, 2) + pow(y3 - player->y, 2), 0.5);
-
-            if (d2 < d3)
+            if (vert) // vertical intersection}
             {
-                SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
-                //printf("x2, y2 %f %f\n", x2, y2);
+                int lRH = sa / fabs(sa);
+
+                dx = (lRH == 1 ? UNIT2D - rX : rX);
+                dy = dx / ta;
+
+                x3 = player->x + dx * lRH;
+                y3 = player->y - dy * lRH;
+
+                i = (x3 - worldX) / UNIT2D - (lRH == 1 ? 0 : 1);
+                j = (y3 - worldY) / UNIT2D;
+                indx = i + 8 * j;
+
+                dx2 = UNIT2D;
+                dy2 = dx2 / ta;
+
+                while (!world[indx])
+                {
+                    x3 += dx2 * lRH;
+                    y3 -= dy2 * lRH;
+
+                    i = (x3 - worldX) / UNIT2D - (lRH == 1 ? 0 : 1);
+                    j = (y3 - worldY) / UNIT2D;
+                    indx = i + 8 * j;
+
+                    if (indx > 63 || indx < 0)
+                    {
+                        break;
+                    }
+                }
+
+                // SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+                // SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
+            }
+
+            // get the shortest distance if necessary and draw
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+            if (horz && vert)
+            {
+
+                d2 = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
+                d3 = pow(pow(x3 - player->x, 2) + pow(y3 - player->y, 2), 0.5);
+
+                if (d2 < d3)
+                {
+                    SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+                    // printf("x2, y2 %f %f\n", x2, y2);
+                }
+                else
+                {
+                    SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
+                    // printf("x3, y3 %f %f\n", x3, y3);
+                }
             }
             else
             {
-                SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
-                //printf("x3, y3 %f %f\n", x3, y3);
-            }
-        }
-        else
-        {
-            if (horz)
-            {
-                SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
-                //printf("x2, y2 %f %f\n", x2, y2);
-            }
-            else
-            {
-                SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
-                //printf("x3, y3 %f %f\n", x3, y3);
+                if (horz)
+                {
+                    SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+                    // printf("x2, y2 %f %f\n", x2, y2);
+                }
+                else
+                {
+                    SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
+                    // printf("x3, y3 %f %f\n", x3, y3);
+                }
             }
         }
     }
