@@ -4,7 +4,7 @@
 
 #define REFRESHRATE 1000 / 30 // 1000/fps
 #define FULLSCREEN false
-#define CURSOR false
+#define CURSOR true
 #define SCREEN_X 50
 #define SCREEN_Y 50
 

@@ -1,3 +1,4 @@
+#define MOUSE false
 int moving = -1;
 int rotating = 0;
 
@@ -37,9 +38,12 @@ void eventFunc(SDL_Event e)
         moving = -1;
     }
 
-    if (e.type == SDL_MOUSEMOTION)
+    if (MOUSE)
     {
-        rotatePlayer(player, e.motion.xrel > 0 ? 1 : -1);
+        if (e.type == SDL_MOUSEMOTION)
+        {
+            rotatePlayer(player, e.motion.xrel > 0 ? 1 : -1);
+        }
     }
 }
 
@@ -102,40 +106,39 @@ void drawPlayer(SDL_Renderer *renderer)
 
 void drawRays(SDL_Renderer *renderer)
 {
-    int a = RADIANS * player->a;
+    if (abs(player->a) != 90) // horizontal intersection (don't check for |90deg| ya l boubou)
 
-    // relative to unit square
-    int rX = (int)player->x % UNIT2D;
-    int rY = (int)player->y % UNIT2D;
-
-    // horizontal intersection
-    double pdy = rY;
-    double pdx = 0;
-    if (tan(a))
     {
-        pdx = pdy / tan(a);
+        int rX = (int)player->x % UNIT2D;
+        int rY = (int)player->y % UNIT2D;
+
+        int up = ((abs(player->a) <= 90 || abs(player->a) >= 270) ? 1 : -1); // are we looking up or down :/
+
+        double ta = tan(RADIANS * (player->a));
+        double dy = (up == 1 ? rY : UNIT2D - rY);
+        double dx = dy * ta;
+
+        double x2 = player->x + dx * up;
+        double y2 = player->y - dy * up; // invert the y
+
+        int i = x2 / UNIT2D;
+        int j = y2 / UNIT2D - (up == 1 ? 1 : 0);
+
+        double dy2 = UNIT2D;
+        double dx2 = dy2 * ta;
+
+        while (!world[i + j * 8])
+        {
+            x2 += dx2 * up;
+            y2 -= dy2 * up;
+            i = x2 / UNIT2D;
+            j = y2 / UNIT2D - (up == 1 ? 1 : 0);
+        }
+
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
     }
-
-    double x2 = player->x + pdx;
-    double y2 = player->y - pdy;
-    // normalize coords
-    int i = x2 / UNIT2D;
-    int j = y2 / UNIT2D;
-
-    printf("%d, %d\n", i, j);
-
-    if (world[i + j * 8]) // check the player unit square
-    {
-        printf("hit\n");
-    }
-    else // extend to new coords
-    {
-    }
-
-    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-    SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
-
-    // vertical intersection
+    // vertical intersection}
 }
 
 void drawCenterSight(SDL_Renderer *renderer)

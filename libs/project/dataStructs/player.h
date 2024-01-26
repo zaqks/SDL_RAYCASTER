@@ -21,13 +21,9 @@ void rotatePlayer(Player *player, int a)
 {
     // angle update
     player->a += a * SENS;
-    if (player->a == 360)
+    if ((player->a / abs(player->a)) * player->a >= 360)
     {
         player->a = 0;
-    }
-    if (player->a == -1)
-    {
-        player->a = 359;
     }
 
     // ax ay
