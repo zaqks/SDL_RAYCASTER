@@ -1,4 +1,5 @@
 int moving = -1;
+int rotating = 0;
 
 int keys[4] = {SDLK_w, SDLK_d, SDLK_s, SDLK_a};
 
@@ -10,12 +11,10 @@ void eventFunc(SDL_Event e)
         {
             // rotation
         case SDLK_RIGHT:
-            rotatePlayer(player, 1);
-
+            rotating = 1;
             break;
         case SDLK_LEFT:
-            rotatePlayer(player, -1);
-
+            rotating = -1;
             break;
 
         default:
@@ -47,26 +46,34 @@ void eventFunc(SDL_Event e)
 void drawMap2D(SDL_Renderer *renderer)
 {
     SDL_Rect current;
-    current.w = UNIT2D - 1;
-    current.h = UNIT2D - 1;
+    current.w = UNIT2D;
+    current.h = UNIT2D;
+
+    SDL_Rect current2;
+    current2.w = UNIT2D;
+    current2.h = UNIT2D;
 
     // draw the walls
     for (int j = 0; j < 8; j++)
     {
         current.y = j * current.h + worldY;
-        current.y += j;
+        current2.y = j * current2.h + worldY;
 
         for (int i = 0; i < 8; i++)
         {
-            if (world[i + 8 * j])
-            {
-                current.x = i * current.w + worldX;
-                current.x += i;
+            current.x = i * current.w + worldX;
+            current2.x = i * current2.w + worldX;
 
+            if (world[i + 8 * j]) // wall
+            {
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
                 SDL_RenderFillRect(renderer, &current);
                 SDL_RenderDrawRect(renderer, &current);
             }
+
+            // guide
+            SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
+            SDL_RenderDrawRect(renderer, &current2);
         }
     }
 }
@@ -87,14 +94,48 @@ void drawPlayer(SDL_Renderer *renderer)
 
     SDL_RenderDrawLine(renderer, px, py, px + player->ax * unit, py + player->ay * unit); // y
     SDL_RenderDrawLine(renderer,
-                       px - player->ax2 * unit/2,
-                       py - player->ay2 * unit/2,
-                       px + player->ax2 * unit/2,
-                       py + player->ay2 * unit/2); // x
+                       px - player->ax2 * unit / 2,
+                       py - player->ay2 * unit / 2,
+                       px + player->ax2 * unit / 2,
+                       py + player->ay2 * unit / 2); // x
 }
 
 void drawRays(SDL_Renderer *renderer)
 {
+    int a = RADIANS * player->a;
+
+    // relative to unit square
+    int rX = (int)player->x % UNIT2D;
+    int rY = (int)player->y % UNIT2D;
+
+    // horizontal intersection
+    double pdy = rY;
+    double pdx = 0;
+    if (tan(a))
+    {
+        pdx = pdy / tan(a);
+    }
+
+    double x2 = player->x + pdx;
+    double y2 = player->y - pdy;
+    // normalize coords
+    int i = x2 / UNIT2D;
+    int j = y2 / UNIT2D;
+
+    printf("%d, %d\n", i, j);
+
+    if (world[i + j * 8]) // check the player unit square
+    {
+        printf("hit\n");
+    }
+    else // extend to new coords
+    {
+    }
+
+    SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
+    SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+
+    // vertical intersection
 }
 
 void drawCenterSight(SDL_Renderer *renderer)
@@ -116,19 +157,25 @@ void loopFunc(Window *win)
         movePlayer(player, moving);
     }
 
+    if (rotating)
+    {
+        rotatePlayer(player, rotating);
+        rotating = 0;
+    }
+
     //
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
     //
 
-    // draw rays
-    drawRays(renderer);
-
     // draw 2 map
     drawMap2D(renderer);
     drawPlayer(renderer); // draw player
 
-    drawCenterSight(renderer);
+    // draw rays
+    drawRays(renderer);
+
+    // drawCenterSight(renderer);
 
     //
     SDL_RenderPresent(renderer);
