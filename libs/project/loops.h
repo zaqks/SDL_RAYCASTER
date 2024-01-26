@@ -124,6 +124,8 @@ void drawRays(SDL_Renderer *renderer)
         }
     }
 
+    //printf(horz ? "horz\n" : (vert ? "vert\n" : "nada\n"));
+
     if (horz || vert) // check if we need to init the vars
     {
 
@@ -137,11 +139,11 @@ void drawRays(SDL_Renderer *renderer)
 
         double x2; // h
         double y2; // h
-        double d2 = 0;
+        double d2;
 
         double x3; // v
         double y3; // v
-        double d3 = 0;
+        double d3;
 
         int i;
         int j;
@@ -184,8 +186,6 @@ void drawRays(SDL_Renderer *renderer)
                 }
             }
 
-            d2 = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
-
             // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
             // SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
         }
@@ -222,8 +222,6 @@ void drawRays(SDL_Renderer *renderer)
                 }
             }
 
-            d3 = pow(pow(x3 - player->x, 2) + pow(y3 - player->y, 2), 0.5);
-
             // SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
             // SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
         }
@@ -238,13 +236,39 @@ void drawRays(SDL_Renderer *renderer)
         */
 
         SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-        if (d2 < d3)
+
+        //printf("dh %f\n", d2);
+        //printf("dv %f\n", d3);
+
+        if (horz && vert)
         {
-            SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+
+            d2 = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
+            d3 = pow(pow(x3 - player->x, 2) + pow(y3 - player->y, 2), 0.5);
+
+            if (d2 < d3)
+            {
+                SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+                //printf("x2, y2 %f %f\n", x2, y2);
+            }
+            else
+            {
+                SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
+                //printf("x3, y3 %f %f\n", x3, y3);
+            }
         }
         else
         {
-            SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
+            if (horz)
+            {
+                SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+                //printf("x2, y2 %f %f\n", x2, y2);
+            }
+            else
+            {
+                SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
+                //printf("x3, y3 %f %f\n", x3, y3);
+            }
         }
     }
 }
