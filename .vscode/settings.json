@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "point.h": "c",
+        "world.h": "c",
+        "vars1.h": "c",
+        "player.h": "c"
+    }
+}
