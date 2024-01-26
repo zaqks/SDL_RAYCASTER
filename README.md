@@ -1,11 +1,5 @@
 <h1>SDL RAYCASTER</h1>
 
-<ul>
-    <li>vertical & horizontal ray casting merged</li>
-    <li>no anti-alias support</li>
-    <li>'mini-stairs' problem</li>
-</ul>
-
 
 <img src="https://github.com/zaqks/SDL_RAYCASTER/blob/main/docs/Screenshot%20from%202024-01-24%2021-48-34.png"
     width=100%></img>
