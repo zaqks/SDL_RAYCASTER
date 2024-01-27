@@ -110,20 +110,25 @@ void drawPlayer(SDL_Renderer *renderer)
 
 void drawRays(SDL_Renderer *renderer)
 {
-    float x = player->x;
-    float y = player->y;
 
-    int i = x / (UNIT2D);
-    int j = y / (UNIT2D);
+    float x2 = player->x;
+    float y2 = player->y;
 
-    while (!worldMap[j][i])
+    int i;
+    int j;
+
+    do
     {
-        
+        x2 += player->ax;
+        y2 += player->ay;
 
+        i = x2 / (UNIT2D);
+        j = y2 / (UNIT2D);
 
-        i = (player->x + ax) / (UNIT2D);
-        j = (player->y + ay) / (UNIT2D);
-    }
+    } while (!worldMap[j][i]);
+
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
 }
 
 void drawCenterSight(SDL_Renderer *renderer)
