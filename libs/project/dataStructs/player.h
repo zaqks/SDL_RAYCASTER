@@ -85,5 +85,5 @@ void movePlayer(Player *player, int d)
     if (!worldMap[j][i])
     {
         player->y = newY;
-    }
+    }    
 }
