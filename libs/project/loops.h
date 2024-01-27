@@ -108,7 +108,23 @@ void drawPlayer(SDL_Renderer *renderer)
                        py + player->ay2 * unit / 2); // x
 }
 
-void drawRays(SDL_Renderer *renderer) {}
+void drawRays(SDL_Renderer *renderer)
+{
+    float x = player->x;
+    float y = player->y;
+
+    int i = x / (UNIT2D);
+    int j = y / (UNIT2D);
+
+    while (!worldMap[j][i])
+    {
+        
+
+
+        i = (player->x + ax) / (UNIT2D);
+        j = (player->y + ay) / (UNIT2D);
+    }
+}
 
 void drawCenterSight(SDL_Renderer *renderer)
 {
@@ -147,7 +163,7 @@ void loopFunc(Window *win)
     // draw rays
     drawRays(renderer);
 
-    //drawCenterSight(renderer);
+    // drawCenterSight(renderer);
     //
     SDL_RenderPresent(renderer);
 }
