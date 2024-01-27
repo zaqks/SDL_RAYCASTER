@@ -1,4 +1,4 @@
-#define UNIT2D 20
+#define UNIT2D 15
 
 int worldX = 0;
 int worldY = 0;
