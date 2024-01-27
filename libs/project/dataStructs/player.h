@@ -67,8 +67,8 @@ void movePlayer(Player *player, int d)
     float newX = player->x + dirs[d][0] * DEP;
     float newY = player->y;
 
-    int i = (newX - worldX) / (float)UNIT2D;
-    int j = (newY - worldY) / (float)UNIT2D;
+    int i = (newX - worldX) / (UNIT2D);
+    int j = (newY - worldY) / (UNIT2D);
 
     if (!worldMap[j][i])
     {
@@ -79,11 +79,11 @@ void movePlayer(Player *player, int d)
     newX = player->x;
     newY = player->y + dirs[d][1] * DEP;
 
-    i = (newX - worldX) / (float)UNIT2D;
-    j = (newY - worldY) / (float)UNIT2D;
+    i = (newX - worldX) / (UNIT2D);
+    j = (newY - worldY) / (UNIT2D);
 
     if (!worldMap[j][i])
     {
         player->y = newY;
-    }    
+    }
 }

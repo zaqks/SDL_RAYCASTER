@@ -1,6 +1,7 @@
-#define FOV 66
+#define FOV 66 // 66
+#define FOV2 FOV / 2
 
-#define MOUSE true
+#define MOUSE false
 
 int moving = -1;
 int rotating = 0;
@@ -73,14 +74,17 @@ void drawMap2D(SDL_Renderer *renderer)
 
             if (worldMap[j][i]) // wall
             {
-                SDL_SetRenderDrawColor(renderer, 255 / (worldMap[j][i] + 1), 255 / (worldMap[j][i] + 1), 255 / (worldMap[j][i] + 1), 255);
+                // SDL_SetRenderDrawColor(renderer, 255 / (worldMap[j][i] + 1), 255 / (worldMap[j][i] + 1), 255 / (worldMap[j][i] + 1), 255);
+                SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
                 SDL_RenderFillRect(renderer, &current);
                 SDL_RenderDrawRect(renderer, &current);
             }
 
-            // guide
+            // grid
+            /*
             SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
             SDL_RenderDrawRect(renderer, &current2);
+            */
         }
     }
 }
@@ -108,8 +112,6 @@ void drawPlayer(SDL_Renderer *renderer)
                        py + player->ay2 * unit / 2); // x
 }
 
-void drawRays(SDL_Renderer *renderer) {}
-
 void drawCenterSight(SDL_Renderer *renderer)
 {
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
@@ -119,6 +121,63 @@ void drawCenterSight(SDL_Renderer *renderer)
 
     SDL_RenderDrawLine(renderer, x, y - z, x, y + z);
     SDL_RenderDrawLine(renderer, x - z, y, x + z, y);
+}
+
+void drawRays(SDL_Renderer *renderer)
+{
+    float ax;
+    float ay;
+
+    float x2;
+    float y2;
+
+    int i;
+    int j;
+
+    float d;
+
+    float lineH;
+    float offsetY;
+    float x = 0;
+    float xS = SCREEN_WIDTH / FOV;
+
+    for (float a = -FOV2 + player->a; a < FOV2 + player->a; a++)
+    {
+
+        ax = sin(a * RADIANS);
+        ay = -cos(a * RADIANS);
+
+        x2 = player->x;
+        y2 = player->y;
+
+        do
+        {
+            x2 += ax;
+            y2 += ay;
+
+            i = (x2 - worldX) / (UNIT2D);
+            j = (y2 - worldY) / (UNIT2D);
+
+        } while (!worldMap[j][i]);
+
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+
+        // 3D
+
+        d = pow(pow(y2 - player->y, 2) + pow(x2 - player->x, 2), 0.5);
+        //d *= cos(a * RADIANS);
+
+        lineH = SCREEN_HEIGHT * 5 / (d);
+        if (lineH > SCREEN_HEIGHT)
+            lineH = SCREEN_HEIGHT;
+
+        offsetY = (SCREEN_HEIGHT - lineH) / 2;
+
+        SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+        SDL_RenderDrawLine(renderer, x, offsetY, x, offsetY + lineH);
+        x += xS;
+    }
 }
 
 void loopFunc(Window *win)
@@ -147,7 +206,7 @@ void loopFunc(Window *win)
     // draw rays
     drawRays(renderer);
 
-    //drawCenterSight(renderer);
+    drawCenterSight(renderer);
     //
     SDL_RenderPresent(renderer);
 }
