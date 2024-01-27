@@ -1,6 +1,6 @@
 #define WORLD_W 24
 #define WORLD_H 24
-#define UNIT2D SCREEN_HEIGHT / (float)WORLD_H
+#define UNIT2D SCREEN_HEIGHT / WORLD_H
 
 int worldX = 0;
 int worldY = 0;
