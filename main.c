@@ -4,7 +4,7 @@ int main()
 {
     win = initWin("DOOM");
     renderer = win->renderer;
-    SDL_SetRelativeMouseMode(1);
+    //SDL_SetRelativeMouseMode(1);
     
     //init map
     initWorld();

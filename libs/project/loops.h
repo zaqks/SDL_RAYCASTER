@@ -1,7 +1,7 @@
-#define FOV 61
+#define FOV 60
 #define FOV2 FOV / 2
 
-#define MOUSE false
+#define MOUSE true
 
 int moving = -1;
 int rotating = 0;
@@ -146,6 +146,8 @@ void drawRays(SDL_Renderer *renderer)
     double lineX = 0;
     double lineXS = SCREEN_WIDTH / (double)FOV;
 
+    bool drawH; // to set the color
+
     for (int angleR = -FOV2; angleR < FOV2; angleR++)
     {
         angle = player->a + angleR;
@@ -250,9 +252,8 @@ void drawRays(SDL_Renderer *renderer)
                 // SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
             }
 
-            // get the shortest distance if necessary and draw
-            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-
+            // 2d render
+            //  get the shortest distance if necessary and draw
             if (horz)
             {
                 d2 = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
@@ -260,7 +261,9 @@ void drawRays(SDL_Renderer *renderer)
                 if (!vert)
                 {
                     wd = d2;
+                    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
                     SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+                    drawH = true;
                 }
 
                 // printf("x2, y2 %f %f\n", x2, y2);
@@ -271,7 +274,9 @@ void drawRays(SDL_Renderer *renderer)
                 if (!horz)
                 {
                     wd = d3;
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
                     SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
+                    drawH = false;
                 }
                 // printf("x3, y3 %f %f\n", x3, y3);
             }
@@ -281,11 +286,15 @@ void drawRays(SDL_Renderer *renderer)
                 wd = fmin(d2, d3);
                 if (d2 < d3)
                 {
+                    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
                     SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+                    drawH = true;
                 }
                 else
                 {
+                    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
                     SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
+                    drawH = false;
                 }
             }
 
@@ -293,6 +302,15 @@ void drawRays(SDL_Renderer *renderer)
             wd *= cos(RADIANS * (player->a - angle)); // fish eye
             lineH = SCREEN_HEIGHT * 10 / wd;
             yOffset = (SCREEN_HEIGHT - lineH) / (double)2;
+
+            if (drawH)
+            {
+                SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+            }
+            else
+            {
+                SDL_SetRenderDrawColor(renderer, 0, 75, 0, 255);
+            }
 
             for (double x = 0; x < lineXS; x++)
             {
@@ -340,7 +358,7 @@ void loopFunc(Window *win)
     // draw rays
     drawRays(renderer);
 
-     drawCenterSight(renderer);
+    drawCenterSight(renderer);
 
     //
     SDL_RenderPresent(renderer);
