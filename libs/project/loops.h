@@ -80,9 +80,11 @@ void drawMap2D(SDL_Renderer *renderer)
                 SDL_RenderDrawRect(renderer, &current);
             }
 
-            // guide
+            // grid
+            /*
             SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
             SDL_RenderDrawRect(renderer, &current2);
+            */
         }
     }
 }
@@ -150,7 +152,6 @@ void drawRays(SDL_Renderer *renderer)
 
         do
         {
-
             x2 += ax;
             y2 += ay;
 
@@ -165,9 +166,9 @@ void drawRays(SDL_Renderer *renderer)
         // 3D
 
         d = pow(pow(y2 - player->y, 2) + pow(x2 - player->x, 2), 0.5);
-        //d *= cos((player->a - a) * RADIANS);
+        //d *= cos(a * RADIANS);
 
-        lineH = SCREEN_HEIGHT * 10 / (d);
+        lineH = SCREEN_HEIGHT * 5 / (d);
         if (lineH > SCREEN_HEIGHT)
             lineH = SCREEN_HEIGHT;
 
