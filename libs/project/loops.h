@@ -1,6 +1,6 @@
 #define FOV 66
 
-#define MOUSE true
+#define MOUSE false
 
 int moving = -1;
 int rotating = 0;
