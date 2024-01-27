@@ -70,7 +70,7 @@ void movePlayer(Player *player, int d)
     int i = (newX - worldX) / (float)UNIT2D;
     int j = (newY - worldY) / (float)UNIT2D;
 
-    if (!world[i + j * 8])
+    if (!worldMap[j][i])
     {
         player->x = newX;
     }
@@ -82,7 +82,7 @@ void movePlayer(Player *player, int d)
     i = (newX - worldX) / (float)UNIT2D;
     j = (newY - worldY) / (float)UNIT2D;
 
-    if (!world[i + j * 8])
+    if (!worldMap[j][i])
     {
         player->y = newY;
     }

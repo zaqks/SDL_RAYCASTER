@@ -1,5 +1,4 @@
-#define FOV 75
-#define FOV2 FOV / 2
+#define FOV 66
 
 #define MOUSE true
 
@@ -62,25 +61,25 @@ void drawMap2D(SDL_Renderer *renderer)
     current2.h = UNIT2D;
 
     // draw the walls
-    for (int j = 0; j < 8; j++)
+    for (int j = 0; j < WORLD_H; j++)
     {
         current.y = j * current.h + worldY;
         current2.y = j * current2.h + worldY;
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 0; i < WORLD_W; i++)
         {
             current.x = i * current.w + worldX;
             current2.x = i * current2.w + worldX;
 
-            if (world[i + 8 * j]) // wall
+            if (worldMap[j][i]) // wall
             {
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                SDL_SetRenderDrawColor(renderer, 255 / (worldMap[j][i] + 1), 255 / (worldMap[j][i] + 1), 255 / (worldMap[j][i] + 1), 255);
                 SDL_RenderFillRect(renderer, &current);
                 SDL_RenderDrawRect(renderer, &current);
             }
 
             // guide
-            SDL_SetRenderDrawColor(renderer, 128, 128, 128, 255);
+            SDL_SetRenderDrawColor(renderer, 150, 150, 150, 255);
             SDL_RenderDrawRect(renderer, &current2);
         }
     }
@@ -90,11 +89,12 @@ void drawPlayer(SDL_Renderer *renderer)
 {
 
     // draw body
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-
+    /*
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     SDL_RenderDrawPoint(renderer, player->x, player->y);
+    */
 
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
 
     int px = player->x;
     int py = player->y;
@@ -108,219 +108,7 @@ void drawPlayer(SDL_Renderer *renderer)
                        py + player->ay2 * unit / 2); // x
 }
 
-void drawRays(SDL_Renderer *renderer)
-{
-
-    int rX = (int)player->x % UNIT2D;
-    int rY = (int)player->y % UNIT2D;
-
-    float angle;
-    float ca;
-    float sa;
-    float ta;
-
-    float dx;
-    float dy;
-
-    float x2; // h
-    float y2; // h
-    float d2;
-
-    float x3; // v
-    float y3; // v
-    float d3;
-
-    float wd;
-
-    int i;
-    int j;
-    int indx;
-
-    float dx2;
-    float dy2;
-
-    // 3D
-    float lineH;
-    float yOffset;
-
-    float lineX = 0;
-    float lineXS = SCREEN_WIDTH / (float)FOV;
-
-    bool drawH; // to set the color
-
-    for (float angleR = -FOV2; angleR < FOV2; angleR++)
-    {
-        angle = player->a + angleR;
-        bool vert = true;
-        bool horz = true;
-
-        for (int a = 0; a < 4; a++) // a%2 0 vert 1 horz
-        {
-            if (abs(angle) == a * 90)
-            {
-                if (a % 2) // horz
-                {
-                    horz = false;
-                }
-                else // vert
-                {
-                    vert = false;
-                }
-            }
-        }
-
-        // printf(horz ? "horz\n" : (vert ? "vert\n" : "nada\n"));
-
-        if (horz || vert) // check if we need to init the vars
-        {
-
-            ca = cos(RADIANS * angle);
-            sa = sin(RADIANS * angle);
-            ta = sa / ca;
-
-            if (horz) // horizontal intersection (don't check for |90deg| ya l boubou)
-
-            {
-                // int lUP = ((abs(player->a) <= 90 || abs(player->a) >= 270) ? 1 : -1); // are we looking UP or down :/
-                int lUP = ca / fabs(-ca);
-
-                dy = (lUP == 1 ? rY : UNIT2D - rY);
-                dx = dy * ta;
-
-                x2 = player->x + dx * lUP;
-                y2 = player->y - dy * lUP; // invert the y
-
-                i = (x2 - worldX) / UNIT2D;
-                j = (y2 - worldY) / UNIT2D - (lUP == 1 ? 1 : 0);
-                indx = i + 8 * j;
-
-                dy2 = UNIT2D;
-                dx2 = dy2 * ta;
-
-                while (!world[indx])
-                {
-                    x2 += dx2 * lUP;
-                    y2 -= dy2 * lUP;
-
-                    i = (x2 - worldX) / UNIT2D;
-                    j = (y2 - worldY) / UNIT2D - (lUP == 1 ? 1 : 0);
-                    indx = i + 8 * j;
-
-                    if (indx > 63 || indx < 0)
-                    {
-                        break;
-                    }
-                }
-
-                // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-                // SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
-            }
-
-            if (vert) // vertical intersection}
-            {
-                int lRH = sa / fabs(sa);
-
-                dx = (lRH == 1 ? UNIT2D - rX : rX);
-                dy = dx / ta;
-
-                x3 = player->x + dx * lRH;
-                y3 = player->y - dy * lRH;
-
-                i = (x3 - worldX) / UNIT2D - (lRH == 1 ? 0 : 1);
-                j = (y3 - worldY) / UNIT2D;
-                indx = i + 8 * j;
-
-                dx2 = UNIT2D;
-                dy2 = dx2 / ta;
-
-                while (!world[indx])
-                {
-                    x3 += dx2 * lRH;
-                    y3 -= dy2 * lRH;
-
-                    i = (x3 - worldX) / UNIT2D - (lRH == 1 ? 0 : 1);
-                    j = (y3 - worldY) / UNIT2D;
-                    indx = i + 8 * j;
-
-                    if (indx > 63 || indx < 0)
-                    {
-                        break;
-                    }
-                }
-
-                // SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-                // SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);
-            }
-
-            // 2d render
-            //  get the shortest distance if necessary and draw
-            if (horz)
-            {
-                d2 = pow(pow(x2 - player->x, 2) + pow(y2 - player->y, 2), 0.5);
-
-                if (!vert)
-                {
-                    wd = d2;
-                    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-                    //SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);//draw2dray
-                    drawH = true;
-                }
-
-                // printf("x2, y2 %f %f\n", x2, y2);
-            }
-            if (vert)
-            {
-                d3 = pow(pow(x3 - player->x, 2) + pow(y3 - player->y, 2), 0.5);
-                if (!horz)
-                {
-                    wd = d3;
-                    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-                    //SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);//draw2dray
-                    drawH = false;
-                }
-                // printf("x3, y3 %f %f\n", x3, y3);
-            }
-
-            if (horz && vert)
-            {
-                wd = fmin(d2, d3);
-                if (d2 < d3)
-                {
-                    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-                    //SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);//draw2dray
-                    drawH = true;
-                }
-                else
-                {
-                    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-                    //SDL_RenderDrawLine(renderer, player->x, player->y, x3, y3);//draw2dray
-                    drawH = false;
-                }
-            }
-
-            // 3D drawing
-            wd *= cos(RADIANS * (player->a - angle)); // fish eye
-            lineH = SCREEN_HEIGHT * 10 / wd;
-            yOffset = (SCREEN_HEIGHT - lineH) / (float)2;
-
-            if (drawH)
-            {
-                SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-            }
-            else
-            {
-                SDL_SetRenderDrawColor(renderer, 0, 75, 0, 255);
-            }
-
-            //for (float x = 0; x < lineXS; x += 1)
-            for (float x = 0; x < 1; x += 1)
-            {
-                SDL_RenderDrawLine(renderer, lineX + x, yOffset, lineX + x, yOffset + lineH);
-            }
-            lineX += lineXS;
-        }
-    }
-}
+void drawRays(SDL_Renderer *renderer) {}
 
 void drawCenterSight(SDL_Renderer *renderer)
 {
@@ -353,16 +141,13 @@ void loopFunc(Window *win)
     //
 
     // draw 2 map
-    /*
     drawMap2D(renderer);
     drawPlayer(renderer); // draw player
-    */
 
     // draw rays
     drawRays(renderer);
 
-    drawCenterSight(renderer);
-
+    //drawCenterSight(renderer);
     //
     SDL_RenderPresent(renderer);
 }
