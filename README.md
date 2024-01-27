@@ -5,6 +5,6 @@
 <ul>
     <li>larger map</li>
     <li>new coords system</li>
-
     <li>anti-alias support</li>
+    
 </ul>
