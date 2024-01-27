@@ -4,16 +4,16 @@
 
 typedef struct
 {
-    double x;
-    double y;
+    float x;
+    float y;
 
     int a;
-    double ax;
-    double ay;
+    float ax;
+    float ay;
 
     // lateral mouvement
-    double ax2;
-    double ay2;
+    float ax2;
+    float ay2;
 
 } Player;
 
@@ -57,20 +57,20 @@ Player *initPlayer()
 void movePlayer(Player *player, int d)
 {
     // 0 1 2 3
-    double dirs[4][2] = {
+    float dirs[4][2] = {
         {player->ax, player->ay},
         {player->ax2, player->ay2},
         {-player->ax, -player->ay},
         {-player->ax2, -player->ay2}};
 
     // x
-    double newX = player->x + dirs[d][0] * DEP;
-    double newY = player->y;
+    float newX = player->x + dirs[d][0] * DEP;
+    float newY = player->y;
 
-    int i = (newX - worldX) / (double)UNIT2D;
-    int j = (newY - worldY) / (double)UNIT2D;
+    int i = (newX - worldX) / (float)UNIT2D;
+    int j = (newY - worldY) / (float)UNIT2D;
 
-    if (!world[i + j * 8])
+    if (!worldMap[j][i])
     {
         player->x = newX;
     }
@@ -79,10 +79,10 @@ void movePlayer(Player *player, int d)
     newX = player->x;
     newY = player->y + dirs[d][1] * DEP;
 
-    i = (newX - worldX) / (double)UNIT2D;
-    j = (newY - worldY) / (double)UNIT2D;
+    i = (newX - worldX) / (float)UNIT2D;
+    j = (newY - worldY) / (float)UNIT2D;
 
-    if (!world[i + j * 8])
+    if (!worldMap[j][i])
     {
         player->y = newY;
     }
