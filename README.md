@@ -8,6 +8,7 @@
     <li>new coords system</li>
     <li>revert to custom raycasting</li>
     <li>anti-alias support</li>
+    <li>fish eye fix using AA</li>
 </ul>
 
 

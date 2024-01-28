@@ -144,8 +144,8 @@ void drawRays(SDL_Renderer *renderer)
     for (float a = -FOV2 + player->a; a < FOV2 + player->a; a++)
     {
 
-        ax = sin(a * RADIANS);
-        ay = -cos(a * RADIANS);
+        ax = sin(a * RADIANS) * sqrt(2);
+        ay = -cos(a * RADIANS) * sqrt(2);
 
         x2 = player->x;
         y2 = player->y;
