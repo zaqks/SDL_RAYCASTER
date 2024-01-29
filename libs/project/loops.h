@@ -1,5 +1,6 @@
 #define FOV 66 // 66
 #define FOV2 FOV / 2
+#define VDIST 100
 
 #define MOUSE false
 
@@ -134,6 +135,7 @@ void drawRays(SDL_Renderer *renderer)
     int i;
     int j;
 
+    float dx;
     float d;
 
     float lineH;
@@ -150,6 +152,9 @@ void drawRays(SDL_Renderer *renderer)
         x2 = player->x;
         y2 = player->y;
 
+        d = 0;
+        dx = sqrt(pow(ax, 2) + pow(ay, 2));
+
         do
         {
             x2 += ax;
@@ -158,15 +163,20 @@ void drawRays(SDL_Renderer *renderer)
             i = (x2 - worldX) / (UNIT2D);
             j = (y2 - worldY) / (UNIT2D);
 
+            d += dx;
+
+            if (i > WORLD_W || j > WORLD_H)
+            {
+                break;
+            }
+
         } while (!worldMap[j][i]);
 
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
 
         // 3D
-
-        d = pow(pow(y2 - player->y, 2) + pow(x2 - player->x, 2), 0.5);
-        //d *= cos(a * RADIANS);
+        // d *= cos(a * RADIANS);
 
         lineH = SCREEN_HEIGHT * 5 / (d);
         if (lineH > SCREEN_HEIGHT)
