@@ -1,6 +1,6 @@
 #define FOV 66 // 66
 #define FOV2 FOV / 2
-#define VDIST 100
+#define VDIST 100 // vision dist
 
 #define MOUSE false
 
@@ -170,7 +170,12 @@ void drawRays(SDL_Renderer *renderer)
                 break;
             }
 
-        } while (!worldMap[j][i]);
+            if (worldMap[j][i])
+            {
+                break;
+            }
+
+        } while (d < VDIST);
 
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
