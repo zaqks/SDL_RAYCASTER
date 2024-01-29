@@ -1,6 +1,6 @@
 #define FOV 66 // 66
 #define FOV2 FOV / 2
-#define VDIST 100 // vision dist
+#define VDIST 500 // vision dist
 
 #define GRID true
 
@@ -167,6 +167,10 @@ void draw2DRays(SDL_Renderer *renderer)
 
             if (!validCoords(i, j)) // existance check
             {
+                if (d - dx > 0)
+                {
+                    d -= dx;
+                }
                 break;
             }
             if (worldMap[j][i])
@@ -196,18 +200,18 @@ void draw3DRays(SDL_Renderer *renderer)
     for (int x = 0; x < FOV; x++)
     {
         d = distances[x];
-        //d *= cos(RADIANS * (-FOV2 + player->a + x));
+        if (d > 0)
+        {
+            xR = x * SCREEN_WIDTH / FOV;
 
-        xR = x * SCREEN_WIDTH / FOV;
-        // d *= cos(a * RADIANS);
+            lineH = SCREEN_HEIGHT / (d) * WORLD_H;
+            if (lineH > SCREEN_HEIGHT)
+                lineH = SCREEN_HEIGHT;
 
-        lineH = SCREEN_HEIGHT * 5 / (d);
-        if (lineH > SCREEN_HEIGHT)
-            lineH = SCREEN_HEIGHT;
+            offsetY = (SCREEN_HEIGHT - lineH) / 2;
 
-        offsetY = (SCREEN_HEIGHT - lineH) / 2;
-
-        SDL_RenderDrawLine(renderer, xR, offsetY, xR, offsetY + lineH);
+            SDL_RenderDrawLine(renderer, xR, offsetY, xR, offsetY + lineH);
+        }
     }
 }
 
