@@ -70,9 +70,12 @@ void movePlayer(Player *player, int d)
     int i = (newX - worldX) / (UNIT2D);
     int j = (newY - worldY) / (UNIT2D);
 
-    if (!worldMap[j][i])
+    if (validCoords(i, j))
     {
-        player->x = newX;
+        if (!worldMap[j][i])
+        {
+            player->x = newX;
+        }
     }
 
     // y
@@ -82,8 +85,11 @@ void movePlayer(Player *player, int d)
     i = (newX - worldX) / (UNIT2D);
     j = (newY - worldY) / (UNIT2D);
 
-    if (!worldMap[j][i])
+    if (validCoords(i, j))
     {
-        player->y = newY;
+        if (!worldMap[j][i])
+        {
+            player->y = newY;
+        }
     }
 }

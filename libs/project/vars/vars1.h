@@ -1,6 +1,6 @@
 #define WORLD_W 24
 #define WORLD_H 24
-#define UNIT2D 10
+#define UNIT2D SCREEN_HEIGHT / WORLD_H
 
 int worldX = 0;
 int worldY = 0;
@@ -36,4 +36,9 @@ void initWorld()
 {
     worldX = 0;
     worldY = SCREEN_HEIGHT - UNIT2D * WORLD_H;
+}
+
+bool validCoords(int i, int j)
+{
+    return ((i < WORLD_W && i >= 0) && (j < WORLD_H && j >= 0));
 }
