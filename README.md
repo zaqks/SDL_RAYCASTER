@@ -10,6 +10,7 @@
     <li>anti-alias support</li>
     <li>fish eye fix using AA</li>
     <li>fixed draw distance</li>
+    <li>separated 2D and 3D windows</li>
 </ul>
 
 
