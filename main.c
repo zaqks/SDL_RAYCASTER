@@ -2,11 +2,14 @@
 
 int main()
 {
-    win = initWin("DOOM");
+    win = initWin("2D");
     renderer = win->renderer;
-    //SDL_SetRelativeMouseMode(1);
-    
-    //init map
+
+    win2 = initWin("3D");
+    renderer2 = win2->renderer;
+    // SDL_SetRelativeMouseMode(1);
+
+    // init map
     initWorld();
 
     // init player
