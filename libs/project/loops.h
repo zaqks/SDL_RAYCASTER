@@ -11,7 +11,7 @@ int rotating = 0;
 
 int keys[4] = {SDLK_w, SDLK_d, SDLK_s, SDLK_a};
 
-int distances[FOV] = {};
+int distances[FOV][2] = {};
 
 void eventFunc(SDL_Event e)
 {
@@ -180,7 +180,8 @@ void draw2DRays(SDL_Renderer *renderer)
 
         } while (d < VDIST);
 
-        distances[((int)a + (int)FOV2 - (int)player->a)] = d;
+        distances[((int)a + (int)FOV2 - (int)player->a)][0] = worldMap[j][i];
+        distances[((int)a + (int)FOV2 - (int)player->a)][1] = d; // i, dist
 
         // 2D
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
@@ -199,12 +200,12 @@ void draw3DRays(SDL_Renderer *renderer)
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     for (int x = 0; x < FOV; x++)
     {
-        d = distances[x];
+        d = distances[x][1];
         if (d > 0)
         {
             xR = x * SCREEN_WIDTH / FOV;
 
-            lineH = SCREEN_HEIGHT / (d) * WORLD_H;
+            lineH = SCREEN_HEIGHT / (d)*WORLD_H;
             if (lineH > SCREEN_HEIGHT)
                 lineH = SCREEN_HEIGHT;
 
@@ -213,6 +214,56 @@ void draw3DRays(SDL_Renderer *renderer)
             SDL_RenderDrawLine(renderer, xR, offsetY, xR, offsetY + lineH);
         }
     }
+
+    // anti alias
+
+    float wallDs[WALLS_NUM][FOV][2] = {}; // keep the org indx
+    int indxs[WALLS_NUM] = {};            // num of lines of each wall
+
+    // init indx
+    for (int i = 0; i < WALLS_NUM; i++)
+    {
+        indxs[i] = -1;
+    }
+
+    int currentWall;
+    for (int i = 0; i < FOV; i++)
+    {
+        currentWall = distances[i][0];
+        indxs[currentWall - 1] += 1;
+
+        wallDs[currentWall - 1][indxs[currentWall - 1]][0] = i;
+        wallDs[currentWall - 1][indxs[currentWall - 1]][1] = distances[i][1];
+    }
+
+    // take the first and last of each wall
+    // calc the spacement between them
+
+    float firstD;
+    float lastD;
+
+    for (int i = 0; i < WALLS_NUM; i++)
+    {
+        if (indxs[i] > 0) // existing wall + contains more than 1 line
+        {
+            // get first and last
+
+            // get dist
+
+            // get avg fact
+
+            // average everything
+            if (indxs[i] + 1 > 2) // contain more than 2 lines
+            {
+                for (int j = 1; j < indxs[i]; j++)
+                {
+                    // each wall line except the margins
+                }
+            }
+        }
+    }
+
+    // average everything
 }
 
 void loopFunc(Window *win)
