@@ -9,6 +9,7 @@
     <li>revert to custom raycasting</li>
     <li>anti-alias support</li>
     <li>fish eye fix using AA</li>
+    <li>fixed draw distance</li>
 </ul>
 
 
