@@ -130,6 +130,34 @@ void drawCenterSight(SDL_Renderer *renderer)
 
 void draw2DRays(SDL_Renderer *renderer)
 {
+    float x1 = player->x;
+    float y1 = player->y;
+    float x2 = player->x;
+    float y2 = player->y;
+
+    float a = (player->a + 45) * RADIANS;
+    float ax = sin(a);
+    float ay = -cos(a);
+
+    int i = x2 / (UNIT2D);
+    int j = y2 / (UNIT2D);
+
+    while (validCoords(i, j))
+    {
+        if (worldMap[j][i])
+        {
+            break;
+        }
+
+        x2 += ax;
+        y2 += ay;
+
+        i = x2 / (UNIT2D);
+        j = y2 / (UNIT2D);
+    }
+z
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 }
 
 void draw3DRays(SDL_Renderer *renderer)
@@ -161,9 +189,9 @@ void loopFunc(Window *win)
 
     // draw rays
     draw2DRays(renderer);
-
     SDL_RenderPresent(renderer);
 
+    /*
     // window2
     SDL_SetRenderDrawColor(renderer2, 0, 0, 0, 255);
     SDL_RenderClear(renderer2);
@@ -172,4 +200,5 @@ void loopFunc(Window *win)
 
     drawCenterSight(renderer2);
     SDL_RenderPresent(renderer2);
+    */
 }
