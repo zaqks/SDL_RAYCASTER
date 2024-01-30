@@ -3,7 +3,6 @@
 #define VDIST 500 // vision dist
 
 #define GRID true
-
 #define MOUSE false
 
 int moving = -1;
@@ -131,113 +130,10 @@ void drawCenterSight(SDL_Renderer *renderer)
 
 void draw2DRays(SDL_Renderer *renderer)
 {
-    float ax;
-    float ay;
-
-    float x2;
-    float y2;
-
-    int i;
-    int j;
-
-    float dx;
-    float d;
-
-    for (float a = -FOV2 + player->a; a < FOV2 + player->a; a++)
-    {
-
-        ax = sin(a * RADIANS) * sqrt(2);
-        ay = -cos(a * RADIANS) * sqrt(2);
-
-        x2 = player->x;
-        y2 = player->y;
-
-        d = 0;
-        dx = sqrt(pow(ax, 2) + pow(ay, 2));
-
-        do
-        {
-            x2 += ax;
-            y2 += ay;
-
-            i = (x2 - worldX) / (UNIT2D);
-            j = (y2 - worldY) / (UNIT2D);
-
-            d += dx;
-
-            if (!validCoords(i, j)) // existance check
-            {
-                if (d - dx > 0)
-                {
-                    d -= dx;
-                }
-                break;
-            }
-            if (worldMap[j][i])
-            {
-                break;
-            }
-
-        } while (d < VDIST);
-
-        distances[((int)a + (int)FOV2 - (int)player->a)][0] = worldMap[j][i];
-        distances[((int)a + (int)FOV2 - (int)player->a)][1] = d; // i, dist
-
-        // 2D
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
-    }
 }
 
 void draw3DRays(SDL_Renderer *renderer)
 {
-    float d;
-    float lineH;
-    float offsetY;
-    float xR = 0;
-    float xS = SCREEN_WIDTH / FOV;
-    // 3D
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    for (int x = 0; x < FOV; x++)
-    {
-        d = distances[x][1];
-        if (d > 0)
-        {
-            xR = x * SCREEN_WIDTH / FOV;
-
-            lineH = SCREEN_HEIGHT / (d)*WORLD_H;
-            if (lineH > SCREEN_HEIGHT)
-                lineH = SCREEN_HEIGHT;
-
-            offsetY = (SCREEN_HEIGHT - lineH) / 2;
-
-            SDL_RenderDrawLine(renderer, xR, offsetY, xR, offsetY + lineH);
-        }
-    }
-
-    // anti alias
-    float wallsDs[WALLS_NUM][FOV] = {};
-    int wallsLines[WALLS_NUM] = {};
-    for (int i = 0; i < WALLS_NUM; i++) // init indxs
-    {
-        wallsLines[i] = 0;
-    }
-
-    int currentWall;
-    float currentD;
-    int miniID;
-
-    for (int i = 0; i < FOV; i++)
-    {
-        currentWall = distances[i][0];
-        currentWall--;
-        currentD = distances[i][1];
-
-        miniID = wallsLines[currentWall];
-        wallsLines[currentWall]++;
-
-        wallsDs[currentWall][miniID] = currentD;
-    }
 }
 
 void loopFunc(Window *win)
