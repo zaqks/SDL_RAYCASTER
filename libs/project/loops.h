@@ -216,54 +216,28 @@ void draw3DRays(SDL_Renderer *renderer)
     }
 
     // anti alias
-
-    float wallDs[WALLS_NUM][FOV][2] = {}; // keep the org indx
-    int indxs[WALLS_NUM] = {};            // num of lines of each wall
-
-    // init indx
-    for (int i = 0; i < WALLS_NUM; i++)
+    float wallsDs[WALLS_NUM][FOV] = {};
+    int wallsLines[WALLS_NUM] = {};
+    for (int i = 0; i < WALLS_NUM; i++) // init indxs
     {
-        indxs[i] = -1;
+        wallsLines[i] = 0;
     }
 
     int currentWall;
+    float currentD;
+    int miniID;
+
     for (int i = 0; i < FOV; i++)
     {
         currentWall = distances[i][0];
-        indxs[currentWall - 1] += 1;
+        currentWall--;
+        currentD = distances[i][1];
 
-        wallDs[currentWall - 1][indxs[currentWall - 1]][0] = i;
-        wallDs[currentWall - 1][indxs[currentWall - 1]][1] = distances[i][1];
+        miniID = wallsLines[currentWall];
+        wallsLines[currentWall]++;
+
+        wallsDs[currentWall][miniID] = currentD;
     }
-
-    // take the first and last of each wall
-    // calc the spacement between them
-
-    float firstD;
-    float lastD;
-
-    for (int i = 0; i < WALLS_NUM; i++)
-    {
-        if (indxs[i] > 0) // existing wall + contains more than 1 line
-        {
-            // get first and last
-
-            // get dist
-
-            // get avg fact
-
-            // average everything
-            if (indxs[i] + 1 > 2) // contain more than 2 lines
-            {
-                for (int j = 1; j < indxs[i]; j++)
-                {
-                    // each wall line except the margins
-                }
-            }
-        }
-    }
-
-    // average everything
 }
 
 void loopFunc(Window *win)
