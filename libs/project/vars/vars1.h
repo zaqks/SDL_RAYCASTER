@@ -42,3 +42,6 @@ bool validCoords(int i, int j)
 {
     return ((i < WORLD_W && i >= 0) && (j < WORLD_H && j >= 0));
 }
+
+SDL_Rect sky;
+SDL_Rect ground;
