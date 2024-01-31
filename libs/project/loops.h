@@ -130,6 +130,11 @@ void drawCenterSight(SDL_Renderer *renderer)
 
 void draw2DRays(SDL_Renderer *renderer)
 {
+    
+
+
+
+
 }
 
 void draw3DRays(SDL_Renderer *renderer)
