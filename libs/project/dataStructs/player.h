@@ -1,5 +1,5 @@
 #define RADIANS M_PI / 180
-#define DEP 2 // move by fact
+#define DEP 10 // move by fact
 #define SENS 3
 
 typedef struct

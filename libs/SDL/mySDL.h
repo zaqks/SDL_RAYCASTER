@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 #define REFRESHRATE 1000 / 30 // 1000/fps
-#define FULLSCREEN true
+#define FULLSCREEN false
 #define CURSOR true
 #define SCREEN_X 50
 #define SCREEN_Y 50
