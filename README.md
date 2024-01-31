@@ -3,7 +3,8 @@
 <h1>SDL RAYCASTER V4</h1>
 
 <ul>
-  <li>project according to cammera plane</li>
+  <li>lighting system</li>
+  <li>AA</li>
 </ul>
 
 
