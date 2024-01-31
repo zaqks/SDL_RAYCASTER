@@ -216,6 +216,7 @@ void draw3DRays(SDL_Renderer *renderer)
     }
 
     // anti alias
+    /*
     float wallsDs[WALLS_NUM][FOV] = {};
     int wallsLines[WALLS_NUM] = {};
     for (int i = 0; i < WALLS_NUM; i++) // init indxs
@@ -238,6 +239,7 @@ void draw3DRays(SDL_Renderer *renderer)
 
         wallsDs[currentWall][miniID] = currentD;
     }
+    */
 }
 
 void loopFunc(Window *win)
