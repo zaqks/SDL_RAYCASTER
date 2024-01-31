@@ -139,6 +139,57 @@ void draw2DRays(SDL_Renderer *renderer)
 
 void draw3DRays(SDL_Renderer *renderer)
 {
+
+    float d;
+    float lineH;
+    float offsetY;
+    float xR = 0;
+    float xS = SCREEN_WIDTH / FOV;
+    // 3D
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    for (int x = 0; x < FOV; x++)
+    {
+        d = distances[x][1];
+        if (d > 0)
+        {
+            xR = x * SCREEN_WIDTH / FOV;
+
+            lineH = SCREEN_HEIGHT / (d)*WORLD_H;
+            if (lineH > SCREEN_HEIGHT)
+                lineH = SCREEN_HEIGHT;
+
+            offsetY = (SCREEN_HEIGHT - lineH) / 2;
+
+            SDL_RenderDrawLine(renderer, xR, offsetY, xR, offsetY + lineH);
+        }
+    }
+
+    // anti alias
+    /*
+    float wallsDs[WALLS_NUM][FOV] = {};
+    int wallsLines[WALLS_NUM] = {};
+    for (int i = 0; i < WALLS_NUM; i++) // init indxs
+    {
+        wallsLines[i] = 0;
+    }
+
+    int currentWall;
+    float currentD;
+    int miniID;
+
+    for (int i = 0; i < FOV; i++)
+    {
+        currentWall = distances[i][0];
+        currentWall--;
+        currentD = distances[i][1];
+
+        miniID = wallsLines[currentWall];
+        wallsLines[currentWall]++;
+
+        wallsDs[currentWall][miniID] = currentD;
+    }
+    */
+
 }
 
 void loopFunc(Window *win)
