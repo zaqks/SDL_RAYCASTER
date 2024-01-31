@@ -1,6 +1,6 @@
 #define FOV 66 // 66
 #define FOV2 FOV / 2
-#define VDIST 500 // vision dist
+#define DRAW_DIST 100 // vision dist
 
 #define GRID true
 #define MOUSE false
@@ -161,9 +161,9 @@ void loopFunc(Window *win)
 
     // draw rays
     draw2DRays(renderer);
-
     SDL_RenderPresent(renderer);
 
+    /*
     // window2
     SDL_SetRenderDrawColor(renderer2, 0, 0, 0, 255);
     SDL_RenderClear(renderer2);
@@ -172,4 +172,5 @@ void loopFunc(Window *win)
 
     drawCenterSight(renderer2);
     SDL_RenderPresent(renderer2);
+    */
 }
