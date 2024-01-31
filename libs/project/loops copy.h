@@ -143,8 +143,6 @@ void draw2DRays(SDL_Renderer *renderer)
     float dx;
     float d;
 
-    bool found;
-
     for (float a = -FOV2 + player->a; a < FOV2 + player->a; a += (FOV) / (float)(RAYSNUM))
     {
 
@@ -160,19 +158,12 @@ void draw2DRays(SDL_Renderer *renderer)
         d = 0;
         dx = sqrt(pow(ax, 2) + pow(ay, 2));
 
-        found = false;
-
         while (validCoords(i, j))
         {
-            /*
-            if (d > DRAW_DIST)
+            if (worldMap[j][i]
+                //|| d > DRAW_DIST
+            )
             {
-                break;
-            }*/
-
-            if (worldMap[j][i])
-            {
-                found = true;
                 break;
             }
 
@@ -185,9 +176,10 @@ void draw2DRays(SDL_Renderer *renderer)
             d += dx;
         };
 
-        distances[(int)(a + FOV2 - player->a)] = found ? d : -1;
+        distances[(int)(a + FOV2 - player->a)] = d;
 
-                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        // 2D
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
         SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
     }
 }
@@ -208,30 +200,23 @@ void draw3DRays(SDL_Renderer *renderer)
 
     for (int i = 0; i < RAYSNUM; i++)
     {
+        currentX = i * SCREEN_WIDTH / (float)(FOV);
         currentD = distances[i];
-        if (currentD > 0)
+        SDL_SetRenderDrawColor(renderer, normalize255(255 * (DRAW_DIST / currentD)), 0, 0, 255);
+
+        lineH = SCREEN_HEIGHT * UNIT2D / currentD;
+        if (lineH > SCREEN_HEIGHT)
         {
-
-            currentX = i * SCREEN_WIDTH / (float)(RAYSNUM);
-            SDL_SetRenderDrawColor(renderer, normalize255(255 * (DRAW_DIST / currentD)), 0, 0, 255);
-
-            lineH = SCREEN_HEIGHT * UNIT2D / currentD;
-            if (lineH > SCREEN_HEIGHT)
-            {
-                lineH = SCREEN_HEIGHT;
-            }
-            offsetY = (SCREEN_HEIGHT - lineH) / 2;
-
-            /*
-            for (float j = 0; j < SCREEN_WIDTH / (float)(RAYSNUM); j++) // ghalta la condition
-            {
-                SDL_RenderDrawLine(renderer, currentX + j, offsetY, currentX + j, offsetY + lineH);
-            }*/
-
-            SDL_RenderDrawLine(renderer, currentX, offsetY, currentX, offsetY + lineH);
-
-            SDL_RenderDrawLine(renderer, currentX, offsetY, currentX, offsetY + lineH);
+            lineH = SCREEN_HEIGHT;
         }
+        offsetY = (SCREEN_HEIGHT - lineH) / 2;
+
+        for (float j = 0; j < SCREEN_WIDTH / (float)(FOV); j++) // ghalta la condition
+        {
+            SDL_RenderDrawLine(renderer, currentX + j, offsetY, currentX + j, offsetY + lineH);
+        }
+
+        SDL_RenderDrawLine(renderer, currentX, offsetY, currentX, offsetY + lineH);
     }
 }
 
@@ -265,15 +250,13 @@ void loopFunc(Window *win)
     SDL_SetRenderDrawColor(renderer2, 0, 0, 0, 255);
     SDL_RenderClear(renderer2);
 
-    
     SDL_SetRenderDrawColor(renderer2, 0, 255, 0, 255);
     SDL_RenderFillRect(renderer2, &ground);
-    SDL_RenderDrawRect(renderer2, &sky);
-
     SDL_SetRenderDrawColor(renderer2, 0, 0, 255, 255);
     SDL_RenderFillRect(renderer2, &sky);
+
+    SDL_RenderDrawRect(renderer2, &sky);
     SDL_RenderDrawRect(renderer2, &ground);
-    
 
     draw3DRays(renderer2);
 
