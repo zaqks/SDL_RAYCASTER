@@ -138,7 +138,11 @@ void draw2DRays(SDL_Renderer *renderer)
 {
     float ax;
     float ay;
+    float ax2;
+    float ay2;
 
+    float x1;
+    float y1;
     float x2;
     float y2;
 
@@ -150,51 +154,58 @@ void draw2DRays(SDL_Renderer *renderer)
 
     bool found;
 
-    for (float a = -FOV2 + player->a; a < FOV2 + player->a; a += (FOV) / (float)(RAYSNUM))
+    float a = player->a;
+
+    ax = sin(a * RADIANS) * sqrt(2);
+    ay = -cos(a * RADIANS) * sqrt(2);
+    ax2 = sin((a + 90) * RADIANS) * sqrt(2);
+    ay2 = -cos((a + 90) * RADIANS) * sqrt(2);
+
+    x1 = player->x;
+    y1 = player->y;
+    x2 = player->x;
+    y2 = player->y;
+
+    x1 += ax2 * 20;
+    y1 += ay2 * 20;
+    x2 += ax2 * 20;
+    y2 += ay2 * 20;
+
+    i = (x2 - worldX) / (UNIT2D);
+    j = (y2 - worldY) / (UNIT2D);
+
+    d = 0;
+    dx = sqrt(pow(ax, 2) + pow(ay, 2));
+
+    found = false;
+
+    while (validCoords(i, j))
     {
+        /*
+        if (d > DRAW_DIST)
+        {
+            break;
+        }*/
 
-        ax = sin(a * RADIANS) * sqrt(2);
-        ay = -cos(a * RADIANS) * sqrt(2);
+        if (worldMap[j][i])
+        {
+            found = true;
+            break;
+        }
 
-        x2 = player->x;
-        y2 = player->y;
+        x2 += ax;
+        y2 += ay;
 
         i = (x2 - worldX) / (UNIT2D);
         j = (y2 - worldY) / (UNIT2D);
 
-        d = 0;
-        dx = sqrt(pow(ax, 2) + pow(ay, 2));
+        d += dx;
+    };
 
-        found = false;
+    distances[(int)(a + FOV2 - player->a)] = found ? d : -1;
 
-        while (validCoords(i, j))
-        {
-            /*
-            if (d > DRAW_DIST)
-            {
-                break;
-            }*/
-
-            if (worldMap[j][i])
-            {
-                found = true;
-                break;
-            }
-
-            x2 += ax;
-            y2 += ay;
-
-            i = (x2 - worldX) / (UNIT2D);
-            j = (y2 - worldY) / (UNIT2D);
-
-            d += dx;
-        };
-
-        distances[(int)(a + FOV2 - player->a)] = found ? d : -1;
-
-                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
-    }
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_RenderDrawLine(renderer, x1, y1, x2, y2);
 }
 
 float normalize255(float val)
@@ -270,7 +281,6 @@ void loopFunc(Window *win)
     SDL_SetRenderDrawColor(renderer2, 0, 0, 0, 255);
     SDL_RenderClear(renderer2);
 
-    
     SDL_SetRenderDrawColor(renderer2, 0, 255, 0, 255);
     SDL_RenderFillRect(renderer2, &ground);
     SDL_RenderDrawRect(renderer2, &sky);
@@ -278,7 +288,6 @@ void loopFunc(Window *win)
     SDL_SetRenderDrawColor(renderer2, 0, 0, 255, 255);
     SDL_RenderFillRect(renderer2, &sky);
     SDL_RenderDrawRect(renderer2, &ground);
-    
 
     draw3DRays(renderer2);
 
