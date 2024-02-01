@@ -1,3 +1,8 @@
+/*
+the projection is done from the player's
+position plane
+*/
+
 #define FOV 66 // 66
 #define FOV2 FOV / 2
 #define DRAW_DIST 100 // vision dist
