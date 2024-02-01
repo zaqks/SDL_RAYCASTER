@@ -190,8 +190,6 @@ void draw2DRays(SDL_Renderer *renderer)
         distances[d2 + RAYSNUM / 2] = found ? d : -1;
         /*
         //distances[d2 + RAYSNUM / 2] = found ? (sqrt(pow(d, 2) + pow(d2, 2))) : -1; 
-        what in the actual fuck should I do next
-        if none of these fucking formulas worked
         */
 
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
