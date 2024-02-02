@@ -27,6 +27,8 @@ int main()
     ground.w = SCREEN_WIDTH;
     ground.h = SCREEN_HEIGHT / 2;
 
+    distances = initQueue();
+
     mainLoop(win, eventFunc, loopFunc);
 
     return 0;
