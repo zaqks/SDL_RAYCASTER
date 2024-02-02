@@ -45,3 +45,5 @@ bool validCoords(int i, int j)
 
 SDL_Rect sky;
 SDL_Rect ground;
+
+Queue *distances;

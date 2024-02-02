@@ -1,9 +1,7 @@
 /*
-the prjection is done from the 
+the prjection is done from the
 player's position point
 */
-
-
 
 #define FOV 66 // 66
 #define FOV2 FOV / 2
@@ -18,7 +16,7 @@ int rotating = 0;
 
 int keys[4] = {SDLK_w, SDLK_d, SDLK_s, SDLK_a};
 
-float distances[RAYSNUM] = {};
+float *currentDistance;
 
 void eventFunc(SDL_Event e)
 {
@@ -153,8 +151,8 @@ void draw2DRays(SDL_Renderer *renderer)
     for (float a = -FOV2 + player->a; a < FOV2 + player->a; a += (FOV) / (float)(RAYSNUM))
     {
 
-        ax = sin(a * RADIANS) * sqrt(2);
-        ay = -cos(a * RADIANS) * sqrt(2);
+        ax = sin(a * RADIANS);  //* sqrt(2);
+        ay = -cos(a * RADIANS); //* sqrt(2);
 
         x2 = player->x;
         y2 = player->y;
@@ -183,7 +181,10 @@ void draw2DRays(SDL_Renderer *renderer)
             d += dx;
         };
 
-        distances[(int)(a + FOV2 - player->a)] = d;
+        // distances[(int)(a + FOV2 - player->a)] = d;
+        currentDistance = (float *)malloc(sizeof(float));
+        *currentDistance = d;
+        pushQueueNode(distances, currentDistance);
 
         // 2D
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
@@ -205,10 +206,12 @@ void draw3DRays(SDL_Renderer *renderer)
     float lineH;
     float offsetY;
 
-    for (int i = 0; i < RAYSNUM; i++)
+    for (int i = 0; i < RAYSNUM &&!emptyQueue(distances); i++)
     {
         currentX = i * SCREEN_WIDTH / (float)(FOV);
-        currentD = distances[i];
+        currentDistance = popQueueNode(distances);
+        currentD = *currentDistance;
+        free(currentDistance);
         SDL_SetRenderDrawColor(renderer, normalize255(255 * (DRAW_DIST / currentD)), 0, 0, 255);
 
         lineH = SCREEN_HEIGHT * UNIT2D / currentD;
