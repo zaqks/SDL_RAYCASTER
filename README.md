@@ -4,7 +4,7 @@
 
 <ul>
   <li>lighting system</li>
-  <li>AA</li>
+  <li>AA(soon)</li>
 </ul>
 
 
