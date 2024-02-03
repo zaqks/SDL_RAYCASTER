@@ -243,7 +243,7 @@ void draw3DRays(SDL_Renderer *renderer)
         }
 
         // let's do some stats
-        
+
         /*
         for each wall:
         get the first d
@@ -253,6 +253,11 @@ void draw3DRays(SDL_Renderer *renderer)
         then resize every line except of the first and last one
         */
     }
+
+    Trapezoid *wall = initTrapezoid(100, 100, 50, 100, 200);
+    SDL_SetRenderDrawColor(renderer2, 0, 255, 100, 255);
+    drawTrapezoid(renderer2, wall);
+    free(wall);
 }
 
 void loopFunc(Window *win)
