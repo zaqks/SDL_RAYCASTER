@@ -16,7 +16,8 @@ int rotating = 0;
 
 int keys[4] = {SDLK_w, SDLK_d, SDLK_s, SDLK_a};
 
-float *currentDistance;
+bool found;
+float wallsD[RAYSNUM][2]; // wall num, dist
 
 void eventFunc(SDL_Event e)
 {
@@ -150,6 +151,7 @@ void draw2DRays(SDL_Renderer *renderer)
 
     for (float a = -FOV2 + player->a; a < FOV2 + player->a; a += (FOV) / (float)(RAYSNUM))
     {
+        found = false;
 
         ax = sin(a * RADIANS);  //* sqrt(2);
         ay = -cos(a * RADIANS); //* sqrt(2);
@@ -169,6 +171,7 @@ void draw2DRays(SDL_Renderer *renderer)
                 //|| d > DRAW_DIST
             )
             {
+                found = true;
                 break;
             }
 
@@ -181,14 +184,21 @@ void draw2DRays(SDL_Renderer *renderer)
             d += dx;
         };
 
-        // distances[(int)(a + FOV2 - player->a)] = d;
+        wallsD[(int)(a + FOV2 - player->a)][0] = found ? worldMap[j][i] : 0;
+        wallsD[(int)(a + FOV2 - player->a)][1] = found ? d : -1;
+        /*
         currentDistance = (float *)malloc(sizeof(float));
-        *currentDistance = d;
+        *currentDistance = found ? d : -1;
         pushQueueNode(distances, currentDistance);
+        */
 
-        // 2D
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+        // draw
+        if (found)
+        {
+
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+            SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+        }
     }
 }
 
@@ -200,33 +210,48 @@ float normalize255(float val)
 void draw3DRays(SDL_Renderer *renderer)
 {
 
+    int currentWall;
     float currentD;
     float currentX;
 
     float lineH;
     float offsetY;
 
-    for (int i = 0; i < RAYSNUM &&!emptyQueue(distances); i++)
+    for (int i = 0; i < RAYSNUM; i++)
     {
-        currentX = i * SCREEN_WIDTH / (float)(FOV);
-        currentDistance = popQueueNode(distances);
-        currentD = *currentDistance;
-        free(currentDistance);
-        SDL_SetRenderDrawColor(renderer, normalize255(255 * (DRAW_DIST / currentD)), 0, 0, 255);
+        currentWall = wallsD[i][0];
+        currentD = wallsD[i][1];
 
-        lineH = SCREEN_HEIGHT * UNIT2D / currentD;
-        if (lineH > SCREEN_HEIGHT)
+        if (currentD > 0)
         {
-            lineH = SCREEN_HEIGHT;
-        }
-        offsetY = (SCREEN_HEIGHT - lineH) / 2;
+            currentX = i * SCREEN_WIDTH / (float)(FOV);
+            SDL_SetRenderDrawColor(renderer, normalize255(255 * (DRAW_DIST / currentD)), 0, 0, 255);
 
-        for (float j = 0; j < SCREEN_WIDTH / (float)(FOV); j++) // ghalta la condition
-        {
-            SDL_RenderDrawLine(renderer, currentX + j, offsetY, currentX + j, offsetY + lineH);
+            lineH = SCREEN_HEIGHT * UNIT2D / currentD;
+            if (lineH > SCREEN_HEIGHT)
+            {
+                lineH = SCREEN_HEIGHT;
+            }
+            offsetY = (SCREEN_HEIGHT - lineH) / 2;
+
+            for (float j = 0; j < SCREEN_WIDTH / (float)(FOV); j++)
+            {
+                SDL_RenderDrawLine(renderer, currentX + j, offsetY, currentX + j, offsetY + lineH);
+            }
+
+            SDL_RenderDrawLine(renderer, currentX, offsetY, currentX, offsetY + lineH);
         }
 
-        SDL_RenderDrawLine(renderer, currentX, offsetY, currentX, offsetY + lineH);
+        // let's do some stats
+        
+        /*
+        for each wall:
+        get the first d
+        get the last d
+        take into consideration the distance between the lines
+        to get the right variation
+        then resize every line except of the first and last one
+        */
     }
 }
 
