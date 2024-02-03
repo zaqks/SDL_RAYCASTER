@@ -4,8 +4,10 @@
 
 <ul>
   <li>lighting system</li>
-  <li>AA(soon)</li>
+  <li>AA(render walls using trapezoids)</li>
+  <li>enhance tracing conversion</li>
 </ul>
 
 
 
+<img src="https://github.com/zaqks/SDL_RAYCASTER/blob/v4/docs/Screenshot%20from%202024-02-03%2013-31-21.png"></img>
