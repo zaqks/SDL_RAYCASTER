@@ -18,6 +18,7 @@ int keys[4] = {SDLK_w, SDLK_d, SDLK_s, SDLK_a};
 
 bool found;
 float wallsD[RAYSNUM][2]; // wall num, dist
+float wallsD2[4][4] = {}; // min and max distances (x, d1, d2, l) x: current indx to obtain the real x coord (x refers to d1's x)
 
 void eventFunc(SDL_Event e)
 {
@@ -149,6 +150,15 @@ void draw2DRays(SDL_Renderer *renderer)
     float dx;
     float d;
 
+    // init the walls
+    for (i = 0; i < 4; i++)
+    {
+        for (j = 0; j < 4; j++)
+        {
+            wallsD2[i][j] = -1;
+        }
+    }
+
     for (float a = -FOV2 + player->a; a < FOV2 + player->a; a += (FOV) / (float)(RAYSNUM))
     {
         found = false;
@@ -195,9 +205,26 @@ void draw2DRays(SDL_Renderer *renderer)
         // draw
         if (found)
         {
-
             SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
             SDL_RenderDrawLine(renderer, player->x, player->y, x2, y2);
+
+            int wallIndx = worldMap[j][i] - 1;
+            // save the wals vals
+            // worldMap[j][i] - 1 => this is the wall indx
+            // wallsD2[wallIndx][0] => x
+            // wallsD2[wallIndx][1] => d1
+            // wallsD2[wallIndx][2] => d2
+            // wallsD2[wallIndx][3] => l
+            if (wallsD2[wallIndx][0] > 0) // d1 already exists soo update d2 and l
+            {
+                wallsD2[wallIndx][2] = d;
+                wallsD2[wallIndx][3] = (int)(a + FOV2 - player->a) - wallsD2[wallIndx][0];
+            }
+            else // create d1 and x
+            {
+                wallsD2[wallIndx][0] = (int)(a + FOV2 - player->a);
+                wallsD2[wallIndx][1] = d;
+            }
         }
     }
 }
@@ -254,10 +281,23 @@ void draw3DRays(SDL_Renderer *renderer)
         */
     }
 
-    Trapezoid *wall = initTrapezoid(100, 100, 50, 100, 200);
-    SDL_SetRenderDrawColor(renderer2, 0, 255, 100, 255);
-    drawTrapezoid(renderer2, wall);
-    free(wall);
+    // let's draw using the new method
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    Trapezoid *wall;
+    float gH; // greatest height to get the y coord
+    float x, y;
+    for (int i = 0; i < 4; i++)
+    {
+        gH = fmax(wallsD2[i][1], wallsD2[i][2]);
+        y = (SCREEN_HEIGHT - gH) / 2;
+
+        x = wallsD2[i][0] * SCREEN_WIDTH / (float)(FOV);
+        wall = initTrapezoid(x, y, wallsD2[i][2], wallsD2[i][1], wallsD2[i][3] * SCREEN_WIDTH / (float)(FOV));
+
+        drawTrapezoid(renderer2, wall);
+        free(wall);
+    }
 }
 
 void loopFunc(Window *win)
