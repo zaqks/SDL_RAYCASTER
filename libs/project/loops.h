@@ -235,58 +235,80 @@ float normalize255(float val)
     return (val > 255 ? 255 : (val < 0 ? 0 : val));
 }
 
+void drawTrapezoid2(SDL_Renderer *renderer, Trapezoid *widget, int r, int g, int b, float maxH) // brightness
+{
+    float x, y, d1, d2, l;
+    x = widget->x;
+    y = widget->y;
+    d1 = widget->d1;
+    d2 = widget->d2;
+    l = widget->l;
+
+    float a;
+
+    a = (d2 - d1) / (float)2;
+    a /= l;
+    a *= -1;
+
+    float x1, y1, x2, y2;
+    x1 = x;
+    x2 = x;
+
+    y1 = y;
+    y2 = y1 + d1;
+
+    for (int i = 0; i < l; i++) // draw relatively to the center of d1
+    {
+        SDL_SetRenderDrawColor(renderer,
+                               normalize255(r * (y2 - i * a - (y1 + i * a)) / maxH),
+                               normalize255(g * (y2 - i * a - (y1 + i * a)) / maxH),
+                               normalize255(b * (y2 - i * a - (y1 + i * a)) / maxH),
+                               255);
+        SDL_RenderDrawLine(renderer, x1 + i, y1 + i * a, x2 + i, y2 - i * a);
+    }
+}
+
 void draw3DRays(SDL_Renderer *renderer)
 {
+    /*
+        int currentWall;
+        float currentD;
+        float currentX;
 
-    int currentWall;
-    float currentD;
-    float currentX;
+        float lineH;
+        float offsetY;
 
-    float lineH;
-    float offsetY;
-
-    for (int i = 0; i < RAYSNUM; i++)
-    {
-        currentWall = wallsD[i][0];
-        currentD = wallsD[i][1];
-
-        if (currentD > 0)
+        for (int i = 0; i < RAYSNUM; i++)
         {
-            currentX = i * SCREEN_WIDTH / (float)(FOV);
-            SDL_SetRenderDrawColor(renderer, normalize255(255 * (DRAW_DIST / currentD)), 0, 0, 255);
+            currentWall = wallsD[i][0];
+            currentD = wallsD[i][1];
 
-            lineH = SCREEN_HEIGHT * UNIT2D / currentD;
-            if (lineH > SCREEN_HEIGHT)
+            if (currentD > 0)
             {
-                lineH = SCREEN_HEIGHT;
-            }
-            offsetY = (SCREEN_HEIGHT - lineH) / 2;
+                currentX = i * SCREEN_WIDTH / (float)(FOV);
+                SDL_SetRenderDrawColor(renderer, normalize255(255 * (DRAW_DIST / currentD)), 0, 0, 255);
 
-            for (float j = 0; j < SCREEN_WIDTH / (float)(FOV); j++)
-            {
-                SDL_RenderDrawLine(renderer, currentX + j, offsetY, currentX + j, offsetY + lineH);
-            }
+                lineH = SCREEN_HEIGHT * UNIT2D / currentD;
+                if (lineH > SCREEN_HEIGHT)
+                {
+                    lineH = SCREEN_HEIGHT;
+                }
+                offsetY = (SCREEN_HEIGHT - lineH) / 2;
 
-            SDL_RenderDrawLine(renderer, currentX, offsetY, currentX, offsetY + lineH);
+                for (float j = 0; j < SCREEN_WIDTH / (float)(FOV); j++)
+                {
+                    SDL_RenderDrawLine(renderer, currentX + j, offsetY, currentX + j, offsetY + lineH);
+                }
+
+                SDL_RenderDrawLine(renderer, currentX, offsetY, currentX, offsetY + lineH);
+            }
         }
 
-        // let's do some stats
-
-        /*
-        for each wall:
-        get the first d
-        get the last d
-        take into consideration the distance between the lines
-        to get the right variation
-        then resize every line except of the first and last one
-        */
-    }
-
-    // let's draw using the new method
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        // let's draw using the new method
+        // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    */
 
     Trapezoid *wall;
-    float gH; // greatest height to get the y coord
     float x, y, d1, d2;
     for (int i = 0; i < 4; i++)
     {
@@ -296,14 +318,12 @@ void draw3DRays(SDL_Renderer *renderer)
         d1 = (SCREEN_HEIGHT * UNIT2D) / d1;
         d2 = (SCREEN_HEIGHT * UNIT2D) / d2;
 
-        gH = fmax(d1, d2);
-
-        y = (SCREEN_HEIGHT - gH) / 2;
+        y = (SCREEN_HEIGHT - d1) / 2;
         x = wallsD2[i][0] * SCREEN_WIDTH / (float)(FOV);
 
-        wall = initTrapezoid(x, y, d1, d2, wallsD2[i][3] * SCREEN_WIDTH / (float)(FOV));
+        wall = initTrapezoid(x, y, d1, d2, (wallsD2[i][3] + 1) * SCREEN_WIDTH / (float)(FOV));
 
-        drawTrapezoid(renderer2, wall);
+        drawTrapezoid2(renderer2, wall, 255, 0, 0, 150);
         free(wall);
     }
 }
