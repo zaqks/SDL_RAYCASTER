@@ -215,15 +215,16 @@ void draw2DRays(SDL_Renderer *renderer)
             // wallsD2[wallIndx][1] => d1
             // wallsD2[wallIndx][2] => d2
             // wallsD2[wallIndx][3] => l
-            if (wallsD2[wallIndx][0] > 0) // d1 already exists soo update d2 and l
-            {
-                wallsD2[wallIndx][2] = d;
-                wallsD2[wallIndx][3] = (int)(a + FOV2 - player->a) - wallsD2[wallIndx][0];
-            }
-            else // create d1 and x
+
+            if (wallsD2[wallIndx][0] < 0) // create d1 and x
             {
                 wallsD2[wallIndx][0] = (int)(a + FOV2 - player->a);
                 wallsD2[wallIndx][1] = d;
+            }
+            else // d1 already exists soo update d2 and l
+            {
+                wallsD2[wallIndx][2] = d;
+                wallsD2[wallIndx][3] = (int)(a + FOV2 - player->a) - wallsD2[wallIndx][0];
             }
         }
     }
@@ -286,14 +287,21 @@ void draw3DRays(SDL_Renderer *renderer)
 
     Trapezoid *wall;
     float gH; // greatest height to get the y coord
-    float x, y;
+    float x, y, d1, d2;
     for (int i = 0; i < 4; i++)
     {
-        gH = fmax(wallsD2[i][1], wallsD2[i][2]);
-        y = (SCREEN_HEIGHT - gH) / 2;
+        d1 = wallsD2[i][1];
+        d2 = wallsD2[i][2];
 
+        d1 = (SCREEN_HEIGHT * UNIT2D) / d1;
+        d2 = (SCREEN_HEIGHT * UNIT2D) / d2;
+
+        gH = fmax(d1, d2);
+
+        y = (SCREEN_HEIGHT - gH) / 2;
         x = wallsD2[i][0] * SCREEN_WIDTH / (float)(FOV);
-        wall = initTrapezoid(x, y, wallsD2[i][2], wallsD2[i][1], wallsD2[i][3] * SCREEN_WIDTH / (float)(FOV));
+
+        wall = initTrapezoid(x, y, d1, d2, wallsD2[i][3] * SCREEN_WIDTH / (float)(FOV));
 
         drawTrapezoid(renderer2, wall);
         free(wall);
